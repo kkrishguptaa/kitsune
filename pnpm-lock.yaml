@@ -13,7 +13,7 @@ importers:
         version: 5.2.10
       '@tailwindcss/vite':
         specifier: ^4.2.1
-        version: 4.2.1(vite@6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))
+        version: 4.2.1(vite@6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))
       hono:
         specifier: ^4.12.7
         version: 4.12.7
@@ -23,13 +23,13 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: 1.28.0
-        version: 1.28.0(vite@6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))(workerd@1.20260312.1)(wrangler@4.73.0)
+        version: 1.28.0(vite@6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))(workerd@1.20260312.1)(wrangler@4.73.0)
       '@types/node':
         specifier: 25.5.0
         version: 25.5.0
       vite:
-        specifier: 6.4.1
-        version: 6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
+        specifier: 6.4.2
+        version: 6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
       vite-ssr-components:
         specifier: 0.5.2
         version: 0.5.2
@@ -1104,8 +1104,8 @@ packages:
     resolution: {integrity: sha512-1a8YThRwyyu1gGjc1Ral9Q4uS+n0D4GydhbkVd9c1SA1YNgXyrOizttped87C1ItEznQzhiCyQjaOcYnXa0zMA==}
     engines: {node: '>=18.0.0'}
 
-  vite@6.4.1:
-    resolution: {integrity: sha512-+Oxm7q9hDoLMyJOYfUYBuHQo+dkAloi33apOPP56pzj+vsdJDzr+j1NISE5pyaAuKL4A3UD34qd0lx5+kfKp2g==}
+  vite@6.4.2:
+    resolution: {integrity: sha512-2N/55r4JDJ4gdrCvGgINMy+HH3iRpNIz8K6SFwVsA+JbQScLiC+clmAxBgwiSPgcG9U15QmvqCGWzMbqda5zGQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -1234,12 +1234,12 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260312.1
 
-  '@cloudflare/vite-plugin@1.28.0(vite@6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))(workerd@1.20260312.1)(wrangler@4.73.0)':
+  '@cloudflare/vite-plugin@1.28.0(vite@6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))(workerd@1.20260312.1)(wrangler@4.73.0)':
     dependencies:
       '@cloudflare/unenv-preset': 2.15.0(unenv@2.0.0-rc.24)(workerd@1.20260312.1)
       miniflare: 4.20260312.0
       unenv: 2.0.0-rc.24
-      vite: 6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
+      vite: 6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
       wrangler: 4.73.0
       ws: 8.18.0
     transitivePeerDependencies:
@@ -1701,12 +1701,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.2.1
       '@tailwindcss/oxide-win32-x64-msvc': 4.2.1
 
-  '@tailwindcss/vite@4.2.1(vite@6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))':
+  '@tailwindcss/vite@4.2.1(vite@6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1))':
     dependencies:
       '@tailwindcss/node': 4.2.1
       '@tailwindcss/oxide': 4.2.1
       tailwindcss: 4.2.1
-      vite: 6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
+      vite: 6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)
 
   '@types/estree@1.0.8': {}
 
@@ -1987,7 +1987,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.4.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1):
+  vite@6.4.2(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
