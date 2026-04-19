@@ -1,82 +1,159 @@
-# kitsune
+# Turborepo starter
 
-Replace your ugly CDN urls with something nice and custom. Built with Hono and Cloudflare.
+This Turborepo starter is maintained by the Turborepo core team.
 
-![Kitsune Demo Gif](https://github.com/kkrishguptaa/kitsune/raw/HEAD/.github/kitsune.gif)
+## Using this example
 
-## Technologies Used
+Run the following command:
 
-1. Hono - A small, simple, and ultra-fast web framework for Cloudflare Workers.
-2. React (`hono/jsx`) - For building the user interface of the dashboard and login pages.
-3. Tailwind CSS - For styling the dashboard and login pages.
-4. Cloudflare Workers - For deploying the application on the edge.
-5. Cloudflare KV - For storing user credentials and session tokens securely.
+```sh
+npx create-turbo@latest
+```
 
-## What exactly does it do?
+## What's inside?
 
-1. You have an ugly CDN url like `https://cdn.hackclub.com/019ce8b0-fb51-77e1-b026-755feddd406b/067A4083.webp`, and you want to replace it with something like `https://cdn.yourdomain.com/image.webp`.
+This Turborepo includes the following packages/apps:
 
-2. You can set up a custom domain (e.g., `cdn.yourdomain.com`) to point to your Cloudflare Worker.
+### Apps and Packages
 
-3. You upload the file through the dashboard, and it gives you a nice URL like `https://cdn.yourdomain.com/cdn/:id_you_give_to_kitsune`.
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
-4. When someone accesses that URL, Kitsune fetches the file from the original CDN and serves it to the user.
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-## Setup Instructions
+### Utilities
 
-1. Clone the repository and navigate to the project directory.
+This Turborepo has some additional tools already setup for you:
 
-2. Install the dependencies:
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
 
-   ```bash
-   pnpm install
-   ```
+### Build
 
-3. Create a `.dev.vars` file in the root of the project and add your Admin credentials:
+To build all apps and packages, run the following command:
 
-   ```env
-    ADMIN_USERNAME=your_username
-    ADMIN_PASSWORD=your_password # generate a hash of your password using `bun scripts/pwdgen.ts your_password` and use the hash here for better security
-    AUTH_SECRET=some_random_secret_for_jwt
-   ```
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
 
-4. Create a KV namespace in your Cloudflare dashboard and add the binding to `wrangler.json`:
+```sh
+cd my-turborepo
+turbo build
+```
 
-   ```json
-   {
-     "kv_namespaces": [
-       {
-         "binding": "db",
-         "id": "your_kv_namespace_id"
-       }
-     ]
-   }
-   ```
+Without global `turbo`, use your package manager:
 
-5. Setup file uploads, `src/lib/storage.ts` is where the file upload logic exists. I'm using `cdn.hackclub.com`, which is a CDN for teenage hackers (members of Hack Club). You can replace it with your own storage solution if you want. Just make sure to update the function to return the URL of the uploaded file.
+```sh
+cd my-turborepo
+npx turbo build
+pnpm dlx turbo build
+pnpm exec turbo build
+```
 
-6. Add whatever credentials you need for the storage solution in the `.dev.vars` file and access them in `src/lib/storage.ts`.
+You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
-7. Run the development server:
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
 
-   ```bash
-   pnpm run dev # this is important, otherwise the cloudflare KV binding won't work
-   ```
+```sh
+turbo build --filter=docs
+```
 
-8. To deploy, remember to put the .dev.vars values in the Cloudflare dashboard as environment variables, and then run:
+Without global `turbo`:
 
-   ```bash
-   pnpm run deploy
-   ```
+```sh
+npx turbo build --filter=docs
+pnpm exec turbo build --filter=docs
+pnpm exec turbo build --filter=docs
+```
 
-## Suggestions for Users
+### Develop
 
-I have a sister project named [imajesus](https://github.com/kkrishguptaa/imajesus).
+To develop all apps and packages, run the following command:
 
-It is a CLI tool that will make your images like 90% smaller using `webp` format. You can use it to compress your images before uploading them to Kitsune to save bandwidth and make them load faster.
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
 
-## Future Improvements
+```sh
+cd my-turborepo
+turbo dev
+```
 
-1. Make kitsune compress the files before serving them to save bandwidth and make them load faster.
+Without global `turbo`, use your package manager:
 
-2. Suggest more features through issues!
+```sh
+cd my-turborepo
+npx turbo dev
+pnpm exec turbo dev
+pnpm exec turbo dev
+```
+
+You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+
+```sh
+turbo dev --filter=web
+```
+
+Without global `turbo`:
+
+```sh
+npx turbo dev --filter=web
+pnpm exec turbo dev --filter=web
+pnpm exec turbo dev --filter=web
+```
+
+### Remote Caching
+
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+
+Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+
+```sh
+cd my-turborepo
+turbo login
+```
+
+Without global `turbo`, use your package manager:
+
+```sh
+cd my-turborepo
+npx turbo login
+pnpm exec turbo login
+pnpm exec turbo login
+```
+
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+
+With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+
+```sh
+turbo link
+```
+
+Without global `turbo`:
+
+```sh
+npx turbo link
+pnpm exec turbo link
+pnpm exec turbo link
+```
+
+## Useful Links
+
+Learn more about the power of Turborepo:
+
+- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
+- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
+- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
+- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
+- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
+- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
