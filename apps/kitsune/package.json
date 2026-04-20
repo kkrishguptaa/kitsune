@@ -12,10 +12,20 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "start": "node --import ./dist/server/instrument.server.mjs ./dist/server/server.js"
+    "check-types": "tsc --noEmit",
+    "start": "node --import ./dist/server/instrument.server.mjs ./dist/server/server.js",
+    "db:generate": "pnpm --filter @kitsune/cms-core db:generate",
+    "db:migrate": "dotenv -e .env.local -- pnpm --filter @kitsune/cms-core db:migrate",
+    "db:push": "dotenv -e .env.local -- pnpm --filter @kitsune/cms-core db:push",
+    "db:studio": "dotenv -e .env.local -- pnpm --filter @kitsune/cms-core db:studio"
   },
   "dependencies": {
+    "@kitsune/cms-core": "workspace:*",
+    "@kitsune/cms-graphql": "workspace:*",
+    "@kitsune/schema": "workspace:*",
+    "@kitsune/ui": "workspace:*",
     "@posthog/react": "^1.7.0",
+    "@workos/authkit-tanstack-react-start": "^0.6.0",
     "@sentry/tanstackstart-react": "^10.42.0",
     "@t3-oss/env-core": "^0.13.10",
     "@tailwindcss/vite": "^4.1.18",
@@ -23,6 +33,8 @@
     "@tanstack/react-start": "latest",
     "@tanstack/router-plugin": "^1.132.0",
     "dotenv-cli": "^11.0.0",
+    "graphql": "^16.10.0",
+    "graphql-yoga": "^5.10.4",
     "posthog-js": "^1.358.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -32,6 +44,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
+    "@kitsune/tsconfig": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

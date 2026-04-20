@@ -3,6 +3,9 @@
 
 @import 'tw-animate-css';
 
+/* Include class names used by the shared UI package in the Tailwind build. */
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

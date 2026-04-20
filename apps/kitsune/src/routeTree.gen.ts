@@ -9,38 +9,273 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiGraphqlRouteImport } from './routes/api/graphql'
+import { Route as AdminOnboardingRouteImport } from './routes/admin/onboarding'
+import { Route as AdminMembersRouteImport } from './routes/admin/members'
+import { Route as AdminLocalesRouteImport } from './routes/admin/locales'
+import { Route as AdminApiKeysRouteImport } from './routes/admin/api-keys'
+import { Route as AdminCollectionsIndexRouteImport } from './routes/admin/collections/index'
+import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
+import { Route as AdminCollectionsSlugRouteRouteImport } from './routes/admin/collections/$slug/route'
+import { Route as AdminCollectionsSlugIndexRouteImport } from './routes/admin/collections/$slug/index'
+import { Route as ApiCmsSchemaPushRouteImport } from './routes/api/cms/schema/push'
+import { Route as AdminCollectionsSlugSchemaRouteImport } from './routes/admin/collections/$slug/schema'
+import { Route as AdminCollectionsSlugIdRouteImport } from './routes/admin/collections/$slug/$id'
 
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGraphqlRoute = ApiGraphqlRouteImport.update({
+  id: '/api/graphql',
+  path: '/api/graphql',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOnboardingRoute = AdminOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLocalesRoute = AdminLocalesRouteImport.update({
+  id: '/locales',
+  path: '/locales',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminApiKeysRoute = AdminApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminCollectionsIndexRoute = AdminCollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
+  id: '/api/auth/callback',
+  path: '/api/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCollectionsSlugRouteRoute =
+  AdminCollectionsSlugRouteRouteImport.update({
+    id: '/collections/$slug',
+    path: '/collections/$slug',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
+const AdminCollectionsSlugIndexRoute =
+  AdminCollectionsSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminCollectionsSlugRouteRoute,
+  } as any)
+const ApiCmsSchemaPushRoute = ApiCmsSchemaPushRouteImport.update({
+  id: '/api/cms/schema/push',
+  path: '/api/cms/schema/push',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCollectionsSlugSchemaRoute =
+  AdminCollectionsSlugSchemaRouteImport.update({
+    id: '/schema',
+    path: '/schema',
+    getParentRoute: () => AdminCollectionsSlugRouteRoute,
+  } as any)
+const AdminCollectionsSlugIdRoute = AdminCollectionsSlugIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminCollectionsSlugRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/locales': typeof AdminLocalesRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/onboarding': typeof AdminOnboardingRoute
+  '/api/graphql': typeof ApiGraphqlRoute
+  '/api/health': typeof ApiHealthRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/collections/$slug': typeof AdminCollectionsSlugRouteRouteWithChildren
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/admin/collections/': typeof AdminCollectionsIndexRoute
+  '/admin/collections/$slug/$id': typeof AdminCollectionsSlugIdRoute
+  '/admin/collections/$slug/schema': typeof AdminCollectionsSlugSchemaRoute
+  '/api/cms/schema/push': typeof ApiCmsSchemaPushRoute
+  '/admin/collections/$slug/': typeof AdminCollectionsSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/locales': typeof AdminLocalesRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/onboarding': typeof AdminOnboardingRoute
+  '/api/graphql': typeof ApiGraphqlRoute
+  '/api/health': typeof ApiHealthRoute
+  '/admin': typeof AdminIndexRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/admin/collections': typeof AdminCollectionsIndexRoute
+  '/admin/collections/$slug/$id': typeof AdminCollectionsSlugIdRoute
+  '/admin/collections/$slug/schema': typeof AdminCollectionsSlugSchemaRoute
+  '/api/cms/schema/push': typeof ApiCmsSchemaPushRoute
+  '/admin/collections/$slug': typeof AdminCollectionsSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/locales': typeof AdminLocalesRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/onboarding': typeof AdminOnboardingRoute
+  '/api/graphql': typeof ApiGraphqlRoute
+  '/api/health': typeof ApiHealthRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/collections/$slug': typeof AdminCollectionsSlugRouteRouteWithChildren
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/admin/collections/': typeof AdminCollectionsIndexRoute
+  '/admin/collections/$slug/$id': typeof AdminCollectionsSlugIdRoute
+  '/admin/collections/$slug/schema': typeof AdminCollectionsSlugSchemaRoute
+  '/api/cms/schema/push': typeof ApiCmsSchemaPushRoute
+  '/admin/collections/$slug/': typeof AdminCollectionsSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/logout'
+    | '/admin/api-keys'
+    | '/admin/locales'
+    | '/admin/members'
+    | '/admin/onboarding'
+    | '/api/graphql'
+    | '/api/health'
+    | '/admin/'
+    | '/admin/collections/$slug'
+    | '/api/auth/callback'
+    | '/admin/collections/'
+    | '/admin/collections/$slug/$id'
+    | '/admin/collections/$slug/schema'
+    | '/api/cms/schema/push'
+    | '/admin/collections/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/logout'
+    | '/admin/api-keys'
+    | '/admin/locales'
+    | '/admin/members'
+    | '/admin/onboarding'
+    | '/api/graphql'
+    | '/api/health'
+    | '/admin'
+    | '/api/auth/callback'
+    | '/admin/collections'
+    | '/admin/collections/$slug/$id'
+    | '/admin/collections/$slug/schema'
+    | '/api/cms/schema/push'
+    | '/admin/collections/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/logout'
+    | '/admin/api-keys'
+    | '/admin/locales'
+    | '/admin/members'
+    | '/admin/onboarding'
+    | '/api/graphql'
+    | '/api/health'
+    | '/admin/'
+    | '/admin/collections/$slug'
+    | '/api/auth/callback'
+    | '/admin/collections/'
+    | '/admin/collections/$slug/$id'
+    | '/admin/collections/$slug/schema'
+    | '/api/cms/schema/push'
+    | '/admin/collections/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
+  ApiGraphqlRoute: typeof ApiGraphqlRoute
+  ApiHealthRoute: typeof ApiHealthRoute
+  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
+  ApiCmsSchemaPushRoute: typeof ApiCmsSchemaPushRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +283,158 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/graphql': {
+      id: '/api/graphql'
+      path: '/api/graphql'
+      fullPath: '/api/graphql'
+      preLoaderRoute: typeof ApiGraphqlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/onboarding': {
+      id: '/admin/onboarding'
+      path: '/onboarding'
+      fullPath: '/admin/onboarding'
+      preLoaderRoute: typeof AdminOnboardingRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/locales': {
+      id: '/admin/locales'
+      path: '/locales'
+      fullPath: '/admin/locales'
+      preLoaderRoute: typeof AdminLocalesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/api-keys': {
+      id: '/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AdminApiKeysRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/collections/': {
+      id: '/admin/collections/'
+      path: '/collections'
+      fullPath: '/admin/collections/'
+      preLoaderRoute: typeof AdminCollectionsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/api/auth/callback': {
+      id: '/api/auth/callback'
+      path: '/api/auth/callback'
+      fullPath: '/api/auth/callback'
+      preLoaderRoute: typeof ApiAuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/collections/$slug': {
+      id: '/admin/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/admin/collections/$slug'
+      preLoaderRoute: typeof AdminCollectionsSlugRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/collections/$slug/': {
+      id: '/admin/collections/$slug/'
+      path: '/'
+      fullPath: '/admin/collections/$slug/'
+      preLoaderRoute: typeof AdminCollectionsSlugIndexRouteImport
+      parentRoute: typeof AdminCollectionsSlugRouteRoute
+    }
+    '/api/cms/schema/push': {
+      id: '/api/cms/schema/push'
+      path: '/api/cms/schema/push'
+      fullPath: '/api/cms/schema/push'
+      preLoaderRoute: typeof ApiCmsSchemaPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/collections/$slug/schema': {
+      id: '/admin/collections/$slug/schema'
+      path: '/schema'
+      fullPath: '/admin/collections/$slug/schema'
+      preLoaderRoute: typeof AdminCollectionsSlugSchemaRouteImport
+      parentRoute: typeof AdminCollectionsSlugRouteRoute
+    }
+    '/admin/collections/$slug/$id': {
+      id: '/admin/collections/$slug/$id'
+      path: '/$id'
+      fullPath: '/admin/collections/$slug/$id'
+      preLoaderRoute: typeof AdminCollectionsSlugIdRouteImport
+      parentRoute: typeof AdminCollectionsSlugRouteRoute
+    }
   }
 }
 
+interface AdminCollectionsSlugRouteRouteChildren {
+  AdminCollectionsSlugIdRoute: typeof AdminCollectionsSlugIdRoute
+  AdminCollectionsSlugSchemaRoute: typeof AdminCollectionsSlugSchemaRoute
+  AdminCollectionsSlugIndexRoute: typeof AdminCollectionsSlugIndexRoute
+}
+
+const AdminCollectionsSlugRouteRouteChildren: AdminCollectionsSlugRouteRouteChildren =
+  {
+    AdminCollectionsSlugIdRoute: AdminCollectionsSlugIdRoute,
+    AdminCollectionsSlugSchemaRoute: AdminCollectionsSlugSchemaRoute,
+    AdminCollectionsSlugIndexRoute: AdminCollectionsSlugIndexRoute,
+  }
+
+const AdminCollectionsSlugRouteRouteWithChildren =
+  AdminCollectionsSlugRouteRoute._addFileChildren(
+    AdminCollectionsSlugRouteRouteChildren,
+  )
+
+interface AdminRouteRouteChildren {
+  AdminApiKeysRoute: typeof AdminApiKeysRoute
+  AdminLocalesRoute: typeof AdminLocalesRoute
+  AdminMembersRoute: typeof AdminMembersRoute
+  AdminOnboardingRoute: typeof AdminOnboardingRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminCollectionsSlugRouteRoute: typeof AdminCollectionsSlugRouteRouteWithChildren
+  AdminCollectionsIndexRoute: typeof AdminCollectionsIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminApiKeysRoute: AdminApiKeysRoute,
+  AdminLocalesRoute: AdminLocalesRoute,
+  AdminMembersRoute: AdminMembersRoute,
+  AdminOnboardingRoute: AdminOnboardingRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminCollectionsSlugRouteRoute: AdminCollectionsSlugRouteRouteWithChildren,
+  AdminCollectionsIndexRoute: AdminCollectionsIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
+  ApiGraphqlRoute: ApiGraphqlRoute,
+  ApiHealthRoute: ApiHealthRoute,
+  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+  ApiCmsSchemaPushRoute: ApiCmsSchemaPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

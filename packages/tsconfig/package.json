@@ -1,0 +1,10 @@
+{
+  "name": "@kitsune/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "node-library.json",
+    "react-library.json"
+  ]
+}
