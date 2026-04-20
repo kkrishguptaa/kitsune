@@ -1,19 +1,28 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import * as React from "react";
+import type * as React from "react";
 import { cn } from "../lib/cn.ts";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  [
+    "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5",
+    "font-mono text-[10.5px] uppercase tracking-[0.14em]",
+    "transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow",
+          "border-[var(--line-strong)] bg-[var(--sea-ink)] text-[var(--paper)]",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground",
+          "border-[var(--line)] bg-[var(--surface-strong)] text-[var(--sea-ink)]",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow",
-        outline: "text-foreground",
+          "border-[color-mix(in_oklab,var(--destructive)_60%,var(--line))] bg-[color-mix(in_oklab,var(--destructive)_12%,var(--surface))] text-[var(--destructive)]",
+        outline:
+          "border-[var(--line-strong)] bg-transparent text-[var(--sea-ink-soft)]",
+        ember:
+          "border-[color-mix(in_oklab,var(--ember)_45%,var(--line))] bg-[var(--ember-soft)] text-[var(--ember-deep)]",
+        lagoon:
+          "border-[color-mix(in_oklab,var(--lagoon-deep)_35%,var(--line))] bg-[color-mix(in_oklab,var(--lagoon)_12%,var(--surface-strong))] text-[var(--lagoon-deep)]",
       },
     },
     defaultVariants: {
@@ -28,9 +37,6 @@ export interface BadgeProps
 
 export function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <span
-      className={cn(badgeVariants({ variant }), className)}
-      {...props}
-    />
+    <span className={cn(badgeVariants({ variant }), className)} {...props} />
   );
 }

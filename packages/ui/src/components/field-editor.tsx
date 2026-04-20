@@ -1,7 +1,7 @@
 import {
   type Field,
-  LOCALIZED_ENVELOPE_KEY,
   isLocalizedEnvelope,
+  LOCALIZED_ENVELOPE_KEY,
 } from "@kitsune/schema";
 import type * as React from "react";
 import { cn } from "../lib/cn.ts";
@@ -88,18 +88,22 @@ export function FieldEditor({
       style={{ marginLeft: depth * 12 }}
     >
       <div className="flex items-center justify-between">
-        <Label htmlFor={field.name} className="text-sm">
+        <Label htmlFor={field.name}>
           {field.label ?? field.name}
-          {field.required ? <span className="ml-0.5 text-red-500">*</span> : null}
+          {field.required ? (
+            <span className="ml-1 text-[var(--ember-deep)]">*</span>
+          ) : null}
         </Label>
         {localized ? (
-          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+          <span className="admin-chip" data-tone="lagoon">
             {locale}
           </span>
         ) : null}
       </div>
       {field.description ? (
-        <p className="text-xs text-muted-foreground">{field.description}</p>
+        <p className="text-[12.5px] leading-relaxed text-[var(--sea-ink-soft)]">
+          {field.description}
+        </p>
       ) : null}
       <FieldControl
         field={field}
@@ -176,8 +180,9 @@ function FieldControl({
             type="checkbox"
             checked={Boolean(value)}
             onChange={(e) => onChange(e.currentTarget.checked)}
+            className="h-4 w-4 accent-[var(--ember)]"
           />
-          <span className="text-muted-foreground">
+          <span className="text-[var(--sea-ink-soft)]">
             {value ? "Enabled" : "Disabled"}
           </span>
         </label>
@@ -210,10 +215,10 @@ function FieldControl({
                     onChange(Array.from(next));
                   }}
                   className={cn(
-                    "rounded-md border px-2 py-1 text-xs transition-colors",
+                    "rounded-full border px-3 py-1 text-[12px] transition-colors",
                     selected
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-input bg-background",
+                      ? "border-[var(--sea-ink)] bg-[var(--sea-ink)] text-[var(--paper)]"
+                      : "border-[var(--line-strong)] bg-[var(--surface)] text-[var(--sea-ink)] hover:border-[var(--lagoon-deep)]",
                   )}
                 >
                   {o.label ?? o.value}
@@ -250,7 +255,7 @@ function FieldControl({
               ? Array.isArray(value)
                 ? (value as string[]).join(",")
                 : ""
-              : (value as string | undefined) ?? ""
+              : ((value as string | undefined) ?? "")
           }
           onChange={(e) => {
             const raw = e.currentTarget.value;

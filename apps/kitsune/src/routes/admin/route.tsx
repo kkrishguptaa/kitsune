@@ -1,8 +1,8 @@
 import { AdminShell, DEFAULT_NAV_ICONS } from "@kitsune/ui";
 import {
+  createFileRoute,
   Link,
   Outlet,
-  createFileRoute,
   useRouterState,
 } from "@tanstack/react-router";
 import { requireWorkspace } from "#/server/workspace";
@@ -61,8 +61,50 @@ function AdminLayout() {
       workspaceSlug={workspace.slug}
       userLabel={userLabel}
       nav={nav}
+      signOutHref="/logout"
+      brand={
+        <Link
+          to="/"
+          className="flex items-center gap-2 no-underline hover:opacity-80"
+        >
+          <span
+            aria-hidden
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--sea-ink)] text-[var(--sea-ink)]"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              role="img"
+              aria-labelledby="admin-brand-title"
+            >
+              <title id="admin-brand-title">Kitsune</title>
+              <path
+                d="M4 20L12 4L20 20"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8 20L12 12L16 20"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--sea-ink)]">
+            Kitsune
+          </span>
+        </Link>
+      }
+      topBar={
+        <span className="font-mono text-[11px] uppercase tracking-[0.18em]">
+          {describePath(pathname)}
+        </span>
+      }
       renderLink={(item, children) => (
-        <Link key={item.href} to={item.href} className="block">
+        <Link key={item.href} to={item.href} className="block no-underline">
           {children}
         </Link>
       )}
@@ -70,4 +112,13 @@ function AdminLayout() {
       <Outlet />
     </AdminShell>
   );
+}
+
+function describePath(pathname: string): string {
+  if (pathname === "/admin") return "Overview";
+  if (pathname.startsWith("/admin/collections")) return "Collections";
+  if (pathname.startsWith("/admin/locales")) return "Locales";
+  if (pathname.startsWith("/admin/members")) return "Members";
+  if (pathname.startsWith("/admin/api-keys")) return "API keys";
+  return "Admin";
 }

@@ -1,11 +1,8 @@
-import { SchemaDesigner } from "@kitsune/ui";
 import type { Fields } from "@kitsune/schema";
+import { SchemaDesigner } from "@kitsune/ui";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  getCollectionFn,
-  publishSchemaFn,
-} from "#/server/cms-actions";
+import { getCollectionFn, publishSchemaFn } from "#/server/cms-actions";
 
 export const Route = createFileRoute("/admin/collections/$slug/schema")({
   loader: async ({ params }) => {
@@ -51,11 +48,7 @@ function SchemaPage() {
           {error}
         </div>
       ) : null}
-      <SchemaDesigner
-        initial={initial}
-        onSave={handleSave}
-        saving={saving}
-      />
+      <SchemaDesigner initial={initial} onSave={handleSave} saving={saving} />
     </div>
   );
 }

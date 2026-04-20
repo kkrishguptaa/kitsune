@@ -1,15 +1,11 @@
+import type { Fields } from "@kitsune/schema";
 import {
   DocumentForm,
   LocaleSwitcher,
   PublishBar,
   RevisionsList,
 } from "@kitsune/ui";
-import type { Fields } from "@kitsune/schema";
-import {
-  createFileRoute,
-  notFound,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   getCollectionFn,
@@ -134,14 +130,13 @@ function DocumentEditor() {
         onOpenRevisions={() => setShowRevisions((s) => !s)}
       />
       {error ? (
-        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-[12px] border border-[color-mix(in_oklab,var(--destructive)_40%,var(--line))] bg-[color-mix(in_oklab,var(--destructive)_10%,var(--surface))] p-3 text-sm text-[var(--destructive)]">
           {error}
         </div>
       ) : null}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          Editing in{" "}
-          <span className="font-mono text-foreground">{locale}</span>
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--sea-ink-soft)]">
+          Editing in <span className="text-[var(--sea-ink)]">{locale}</span>
         </p>
         <LocaleSwitcher
           locales={initial.locales}
@@ -157,8 +152,8 @@ function DocumentEditor() {
         fallbackLocale={defaultLocale}
       />
       {showRevisions ? (
-        <div className="rounded-lg border p-4">
-          <h3 className="mb-2 text-sm font-semibold">Revisions</h3>
+        <div className="admin-card px-5 py-4">
+          <p className="admin-eyebrow mb-3">Revisions</p>
           <RevisionsList
             revisions={initial.revisions.map((r) => ({
               revisionNumber: r.revisionNumber,

@@ -1,6 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { getAuth } from "@workos/authkit-tanstack-react-start";
 
-export const Route = createFileRoute("/admin/onboarding")({
+export const Route = createFileRoute("/onboarding")({
+  loader: async () => {
+    const auth = await getAuth();
+    if (!auth.user) {
+      throw redirect({ to: "/login" });
+    }
+    return null;
+  },
   component: Onboarding,
 });
 
@@ -16,9 +24,9 @@ function Onboarding() {
           You're in. Your workspace is being cast.
         </h1>
         <p className="max-w-xl text-base text-[var(--sea-ink-soft)]">
-          Kitsune is provisioning a personal workspace for your account on
-          first sign-in. Give it a moment, then reload — the admin console
-          will appear here.
+          Kitsune is provisioning a personal workspace for your account on first
+          sign-in. Give it a moment, then reload — the admin console will appear
+          here.
         </p>
         <div className="mt-8 flex items-center gap-3">
           <button

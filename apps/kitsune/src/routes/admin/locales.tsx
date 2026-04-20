@@ -51,25 +51,27 @@ function LocalesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <>
       <header>
-        <h1 className="text-2xl font-semibold">Locales</h1>
-        <p className="text-sm text-muted-foreground">
-          Localized fields in any collection are authored per-locale.
+        <p className="admin-eyebrow mb-2">Chapter 02 · Translation</p>
+        <h1 className="admin-heading">Locales</h1>
+        <p className="mt-2 max-w-xl text-sm text-[var(--sea-ink-soft)]">
+          Localized fields in any collection are authored per-locale. The
+          default fills in as a fallback when a translation is missing.
         </p>
       </header>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border p-4">
-        <div className="flex flex-col gap-1">
+      <div className="admin-card flex flex-wrap items-end gap-4 px-5 py-4">
+        <div className="flex flex-col gap-1.5">
           <Label>Code</Label>
           <Input
             value={code}
             onChange={(e) => setCode(e.currentTarget.value)}
             placeholder="fr"
-            className="w-32"
+            className="w-32 font-mono"
           />
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <Label>Label</Label>
           <Input
             value={label}
@@ -81,18 +83,22 @@ function LocalesPage() {
         <Button onClick={add} disabled={busy || !code || !label}>
           Add locale
         </Button>
-        {error ? <p className="w-full text-xs text-destructive">{error}</p> : null}
+        {error ? (
+          <p className="w-full text-xs text-[var(--destructive)]">{error}</p>
+        ) : null}
       </div>
 
-      <ul className="divide-y rounded-lg border">
+      <ul className="admin-card divide-y divide-[color-mix(in_oklab,var(--line)_80%,transparent)] overflow-hidden p-0">
         {locales.map((l) => (
           <li
             key={l.code}
-            className="flex items-center gap-3 px-4 py-3 text-sm"
+            className="flex items-center gap-3 px-5 py-3.5 text-sm"
           >
-            <span className="font-mono">{l.code}</span>
-            <span className="text-muted-foreground">{l.label}</span>
-            {l.isDefault ? <Badge>Default</Badge> : null}
+            <span className="font-mono text-[13px] text-[var(--sea-ink)]">
+              {l.code}
+            </span>
+            <span className="text-[var(--sea-ink-soft)]">{l.label}</span>
+            {l.isDefault ? <Badge variant="ember">Default</Badge> : null}
             <div className="ml-auto flex gap-2">
               {!l.isDefault ? (
                 <Button
@@ -115,6 +121,6 @@ function LocalesPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }

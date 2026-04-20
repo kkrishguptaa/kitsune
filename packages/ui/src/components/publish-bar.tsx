@@ -39,21 +39,24 @@ export function PublishBar({
   return (
     <div
       className={cn(
-        "sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/80 p-3 shadow-sm backdrop-blur",
+        "sticky top-14 z-10 flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface-strong)_88%,transparent)] px-4 py-3 backdrop-blur",
+        "shadow-[0_1px_0_var(--inset-glint)_inset,0_10px_24px_rgba(16,51,58,0.06)]",
         className,
       )}
     >
-      <div className="flex items-center gap-2 text-sm">
-        <Badge variant={status === "published" ? "default" : "secondary"}>
+      <div className="flex items-center gap-3 text-sm">
+        <Badge variant={status === "published" ? "lagoon" : "secondary"}>
           {status}
         </Badge>
-        <span className="text-muted-foreground">
+        <span className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-[var(--sea-ink-soft)]">
           {status === "published"
-            ? `Last published ${formatDate(publishedAt)}`
-            : `Last edited ${formatDate(updatedAt)}`}
+            ? `Published ${formatDate(publishedAt)}`
+            : `Edited ${formatDate(updatedAt)}`}
         </span>
         {dirty ? (
-          <span className="text-xs font-medium text-amber-600">Unsaved</span>
+          <span className="admin-chip" data-tone="ember">
+            Unsaved
+          </span>
         ) : null}
       </div>
       <div className="flex items-center gap-2">
@@ -75,7 +78,7 @@ export function PublishBar({
             Unpublish
           </Button>
         ) : (
-          <Button size="sm" onClick={onPublish}>
+          <Button variant="ember" size="sm" onClick={onPublish}>
             Publish
           </Button>
         )}

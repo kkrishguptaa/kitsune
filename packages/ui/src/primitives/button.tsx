@@ -4,25 +4,34 @@ import * as React from "react";
 import { cn } from "../lib/cn.ts";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  [
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium",
+    "transition-[background,color,border-color,transform,box-shadow] duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)]",
+    "disabled:pointer-events-none disabled:opacity-55",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-[var(--sea-ink)] text-[var(--paper)] shadow-[0_1px_0_rgba(255,255,255,0.14)_inset,0_6px_16px_rgba(16,51,58,0.22)] hover:-translate-y-[1px] hover:bg-[color-mix(in_oklab,var(--sea-ink)_82%,var(--ember)_18%)]",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-[var(--destructive)] text-[var(--destructive-foreground)] shadow-[0_1px_0_rgba(255,255,255,0.14)_inset,0_6px_16px_rgba(184,74,58,0.22)] hover:-translate-y-[1px] hover:bg-[color-mix(in_oklab,var(--destructive)_88%,black_12%)]",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--sea-ink)] backdrop-blur-sm hover:border-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface-strong)_84%,var(--lagoon)_6%)] text-[var(--sea-ink)] hover:border-[var(--lagoon-deep)]",
+        ghost:
+          "text-[var(--sea-ink-soft)] hover:bg-[color-mix(in_oklab,var(--sea-ink)_5%,transparent)] hover:text-[var(--sea-ink)]",
+        link: "text-[var(--lagoon-deep)] underline-offset-4 hover:underline rounded-none px-0",
+        ember:
+          "bg-[var(--ember)] text-[var(--paper)] shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_6px_16px_rgba(199,107,59,0.3)] hover:-translate-y-[1px] hover:bg-[var(--ember-deep)]",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        default: "h-10 px-5 text-sm",
+        sm: "h-8 px-3.5 text-[12.5px]",
+        lg: "h-11 px-7 text-[15px]",
         icon: "h-9 w-9",
       },
     },

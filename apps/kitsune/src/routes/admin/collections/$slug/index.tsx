@@ -1,9 +1,5 @@
 import { Button, DocumentTable } from "@kitsune/ui";
-import {
-  Link,
-  createFileRoute,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   createDocumentFn,
@@ -47,7 +43,9 @@ function DocumentsPage() {
   const [creating, setCreating] = useState(false);
 
   if (!data.collection) {
-    return <p className="text-sm text-muted-foreground">Collection missing.</p>;
+    return (
+      <p className="text-sm text-[var(--sea-ink-soft)]">Collection missing.</p>
+    );
   }
 
   const { collection, schemaVersion, documents } = data;
@@ -72,9 +70,9 @@ function DocumentsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-[var(--sea-ink-soft)]">
           {documents.length} document{documents.length === 1 ? "" : "s"}
         </p>
         {schemaVersion ? (
@@ -85,9 +83,9 @@ function DocumentsPage() {
           <Link
             to="/admin/collections/$slug/schema"
             params={{ slug: collection.slug }}
-            className="text-sm underline"
+            className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--ember-deep)] no-underline"
           >
-            Create schema first →
+            Design a schema first →
           </Link>
         )}
       </div>

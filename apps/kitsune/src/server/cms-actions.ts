@@ -1,12 +1,16 @@
 import {
-  addLocale as coreAddLocale,
   assertValidSlug,
+  type Collection,
+  type CollectionSchemaVersion,
   canRole,
+  addLocale as coreAddLocale,
   createApiKey,
   createCollection,
   createDocument,
-  deleteDocument,
+  type Document,
   deleteCollection,
+  deleteDocument,
+  getCollectionWithCurrentSchema,
   inviteMember,
   listApiKeys,
   listCollections,
@@ -23,17 +27,13 @@ import {
   setDefaultLocale,
   unpublishDocument,
   updateDocument,
-  type Collection,
-  type CollectionSchemaVersion,
-  type Document,
 } from "@kitsune/cms-core";
-import { getCollectionWithCurrentSchema } from "@kitsune/cms-core";
+import { clearWorkspaceSchemaCache } from "@kitsune/cms-graphql";
 import type { DiffHints, Fields } from "@kitsune/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { env } from "#/env";
 import { db } from "#/lib/db";
-import { clearWorkspaceSchemaCache } from "@kitsune/cms-graphql";
 import { requireWorkspace, requireWorkspaceRole } from "./workspace";
 
 /* ------------------------------------------------------------------ *
@@ -80,13 +80,17 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
 
 export const getCollectionFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ slug: z.string() }))
-  .handler(async ({ data }): Promise<{
-    collection: Collection;
-    schemaVersion: CollectionSchemaVersion | null;
-  } | null> => {
-    const { workspace } = await requireWorkspace();
-    return getCollectionWithCurrentSchema(db, workspace.id, data.slug);
-  });
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      collection: Collection;
+      schemaVersion: CollectionSchemaVersion | null;
+    } | null> => {
+      const { workspace } = await requireWorkspace();
+      return getCollectionWithCurrentSchema(db, workspace.id, data.slug);
+    },
+  );
 
 /* ------------------------------------------------------------------ *
  * Schema versions

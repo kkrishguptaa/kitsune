@@ -1,5 +1,5 @@
-import type * as React from "react";
 import MDEditor, { type MDEditorProps } from "@uiw/react-md-editor";
+import type * as React from "react";
 import { cn } from "../lib/cn.ts";
 
 export interface MarkdownEditorProps

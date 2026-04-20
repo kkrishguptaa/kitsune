@@ -30,29 +30,34 @@ export function RevisionsList({
 }: RevisionsListProps): React.ReactElement {
   if (revisions.length === 0) {
     return (
-      <p className={cn("text-sm text-muted-foreground", className)}>
+      <p className={cn("text-sm text-[var(--sea-ink-soft)]", className)}>
         No revisions yet.
       </p>
     );
   }
   return (
-    <ul className={cn("flex flex-col divide-y", className)}>
+    <ul
+      className={cn(
+        "flex flex-col divide-y divide-[color-mix(in_oklab,var(--line)_80%,transparent)]",
+        className,
+      )}
+    >
       {revisions.map((r) => (
         <li
           key={r.revisionNumber}
-          className="flex items-center gap-3 py-2 text-sm"
+          className="flex items-center gap-3 py-2.5 text-sm"
         >
-          <span className="w-10 font-mono text-xs text-muted-foreground">
+          <span className="w-10 font-mono text-[11.5px] text-[var(--sea-ink-soft)]">
             #{r.revisionNumber}
           </span>
-          <Badge variant={r.status === "published" ? "default" : "secondary"}>
+          <Badge variant={r.status === "published" ? "lagoon" : "secondary"}>
             {r.status}
           </Badge>
-          <span className="text-xs text-muted-foreground">
+          <span className="font-mono text-[11.5px] text-[var(--sea-ink-soft)]">
             {formatDate(r.createdAt)}
           </span>
           {r.createdBy ? (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-[12.5px] text-[var(--sea-ink-soft)]">
               by {r.createdBy}
             </span>
           ) : null}

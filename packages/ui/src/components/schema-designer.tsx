@@ -1,12 +1,12 @@
 import {
-  type Field,
-  type FieldType,
-  type Fields,
   diffSchemas,
+  type Field,
+  type Fields,
+  type FieldType,
 } from "@kitsune/schema";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
 import type * as React from "react";
+import { useMemo, useState } from "react";
 import { cn } from "../lib/cn.ts";
 import { Badge } from "../primitives/badge.tsx";
 import { Button } from "../primitives/button.tsx";
@@ -133,20 +133,31 @@ export function SchemaDesigner({
   }
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center justify-between">
+    <div className={cn("flex flex-col gap-5", className)}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Fields</h2>
-          <p className="text-sm text-muted-foreground">
-            Define the shape of content editors will author for this
-            collection.
+          <p className="admin-eyebrow mb-1">Designer</p>
+          <h2 className="font-serif text-xl font-semibold text-[var(--sea-ink)]">
+            Fields
+          </h2>
+          <p className="text-sm text-[var(--sea-ink-soft)]">
+            Shape the content editors will author for this collection.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
-            Preview changes
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPreviewOpen(true)}
+          >
+            Preview diff
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={saving}>
+          <Button
+            variant="ember"
+            size="sm"
+            onClick={handleSave}
+            disabled={saving}
+          >
             {saving ? "Saving…" : "Save schema"}
           </Button>
         </div>
@@ -156,7 +167,7 @@ export function SchemaDesigner({
         {fields.map((field, i) => (
           <li
             key={`${field.name}-${i}`}
-            className="flex items-start gap-3 rounded-lg border border-input bg-background p-3"
+            className="admin-card flex items-start gap-3 px-4 py-3"
           >
             <button
               type="button"
@@ -203,7 +214,11 @@ export function SchemaDesigner({
                 <Select
                   value={field.type}
                   onValueChange={(t) =>
-                    update(i, { ...blankField(t as FieldType), name: field.name, label: field.label })
+                    update(i, {
+                      ...blankField(t as FieldType),
+                      name: field.name,
+                      label: field.label,
+                    })
                   }
                 >
                   <SelectTrigger>
@@ -295,16 +310,15 @@ export function SchemaDesigner({
           </DialogHeader>
           <ul className="flex flex-col gap-2 text-sm">
             {diff.ops.length === 0 ? (
-              <li className="text-muted-foreground">No changes yet.</li>
+              <li className="text-[var(--sea-ink-soft)]">No changes yet.</li>
             ) : null}
             {diff.ops.map((op, idx) => {
               const path = "path" in op ? op.path : `${op.from} → ${op.to}`;
               return (
-                <li
-                  key={`${op.op}-${idx}`}
-                  className="flex items-center gap-2"
-                >
-                  <Badge variant={op.op === "drop" ? "destructive" : "secondary"}>
+                <li key={`${op.op}-${idx}`} className="flex items-center gap-2">
+                  <Badge
+                    variant={op.op === "drop" ? "destructive" : "secondary"}
+                  >
                     {op.op}
                   </Badge>
                   <span className="font-mono text-xs">{path}</span>
@@ -345,10 +359,7 @@ export function SchemaDesigner({
             })}
           </ul>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setPreviewOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
               Close
             </Button>
             <Button

@@ -25,7 +25,12 @@ export function DocumentForm({
   className,
 }: DocumentFormProps): React.ReactElement {
   return (
-    <div className={cn("flex flex-col gap-5", className)}>
+    <div
+      className={cn(
+        "admin-card flex flex-col gap-6 px-6 py-6 sm:px-8 sm:py-7",
+        className,
+      )}
+    >
       {fields.map((field) => (
         <FieldEditor
           key={field.name}

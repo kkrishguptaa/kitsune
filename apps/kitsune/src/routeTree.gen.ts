@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
@@ -28,6 +29,11 @@ import { Route as ApiCmsSchemaPushRouteImport } from './routes/api/cms/schema/pu
 import { Route as AdminCollectionsSlugSchemaRouteImport } from './routes/admin/collections/$slug/schema'
 import { Route as AdminCollectionsSlugIdRouteImport } from './routes/admin/collections/$slug/$id'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
   path: '/logout',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/onboarding': typeof OnboardingRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/locales': typeof AdminLocalesRoute
   '/admin/members': typeof AdminMembersRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/onboarding': typeof OnboardingRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/locales': typeof AdminLocalesRoute
   '/admin/members': typeof AdminMembersRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/onboarding': typeof OnboardingRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/locales': typeof AdminLocalesRoute
   '/admin/members': typeof AdminMembersRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/logout'
+    | '/onboarding'
     | '/admin/api-keys'
     | '/admin/locales'
     | '/admin/members'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/logout'
+    | '/onboarding'
     | '/admin/api-keys'
     | '/admin/locales'
     | '/admin/members'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/logout'
+    | '/onboarding'
     | '/admin/api-keys'
     | '/admin/locales'
     | '/admin/members'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
+  OnboardingRoute: typeof OnboardingRoute
   ApiGraphqlRoute: typeof ApiGraphqlRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
@@ -255,6 +268,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/logout': {
       id: '/logout'
       path: '/logout'
@@ -431,6 +451,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
+  OnboardingRoute: OnboardingRoute,
   ApiGraphqlRoute: ApiGraphqlRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiAuthCallbackRoute: ApiAuthCallbackRoute,

@@ -31,41 +31,59 @@ export function DocumentTable({
     return (
       <div
         className={cn(
-          "rounded-lg border border-dashed border-input p-8 text-center text-sm text-muted-foreground",
+          "admin-card flex flex-col items-center gap-2 border-dashed px-6 py-14 text-center",
           className,
         )}
       >
-        No documents yet. Create one to get started.
+        <span className="admin-chip" data-tone="muted">
+          Nothing yet
+        </span>
+        <p className="font-serif text-lg text-[var(--sea-ink)]">
+          No documents yet.
+        </p>
+        <p className="max-w-sm text-sm text-[var(--sea-ink-soft)]">
+          Create one to get started — it'll live here alongside its revisions.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={cn("overflow-hidden rounded-lg border", className)}>
+    <div className={cn("admin-card overflow-hidden p-0", className)}>
       <table className="w-full text-sm">
-        <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
+        <thead className="bg-[color-mix(in_oklab,var(--surface-strong)_80%,var(--lagoon)_4%)] text-left font-mono text-[10.5px] uppercase tracking-[0.18em] text-[var(--kicker)]">
           <tr>
-            <th className="px-4 py-2">Title</th>
-            <th className="px-4 py-2">Status</th>
-            <th className="px-4 py-2">Updated</th>
+            <th className="px-5 py-3 font-normal">Title</th>
+            <th className="px-5 py-3 font-normal">Status</th>
+            <th className="px-5 py-3 font-normal">Updated</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
+          {rows.map((row, idx) => (
             <tr
               key={row.id}
-              className="cursor-pointer border-t hover:bg-muted/30"
+              className={cn(
+                "cursor-pointer transition-colors hover:bg-[color-mix(in_oklab,var(--lagoon)_7%,transparent)]",
+                idx !== 0 &&
+                  "border-t border-[color-mix(in_oklab,var(--line)_80%,transparent)]",
+              )}
               onClick={() => onRowClick?.(row.id)}
             >
-              <td className="px-4 py-2 font-medium">{row.title || row.id}</td>
-              <td className="px-4 py-2">
+              <td className="px-5 py-3 font-medium text-[var(--sea-ink)]">
+                {row.title || (
+                  <span className="font-mono text-[12px] text-[var(--sea-ink-faint)]">
+                    {row.id.slice(0, 8)}…
+                  </span>
+                )}
+              </td>
+              <td className="px-5 py-3">
                 <Badge
-                  variant={row.status === "published" ? "default" : "secondary"}
+                  variant={row.status === "published" ? "lagoon" : "secondary"}
                 >
                   {row.status}
                 </Badge>
               </td>
-              <td className="px-4 py-2 text-muted-foreground">
+              <td className="px-5 py-3 font-mono text-[12px] text-[var(--sea-ink-soft)]">
                 {formatDate(row.updatedAt)}
               </td>
             </tr>

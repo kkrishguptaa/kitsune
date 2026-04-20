@@ -1,13 +1,13 @@
 import {
   type Collection,
-  type WorkspaceMember,
-  type Workspace,
   canRole,
   getWorkspaceForUser,
   listWorkspacesForUser,
+  type Workspace,
+  type WorkspaceMember,
 } from "@kitsune/cms-core";
-import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { redirect } from "@tanstack/react-router";
+import { getAuth } from "@workos/authkit-tanstack-react-start";
 import { db } from "#/lib/db";
 
 export type AuthedUser = {
@@ -49,7 +49,7 @@ export async function requireWorkspace(): Promise<WorkspaceContext> {
   const user = await requireUser();
   const workspaces = await listWorkspacesForUser(db, user.id);
   if (workspaces.length === 0) {
-    throw redirect({ href: "/admin/onboarding" });
+    throw redirect({ href: "/onboarding" });
   }
   const workspace = workspaces[0]!;
   return { user, workspace };

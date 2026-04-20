@@ -1,6 +1,6 @@
 import {
-  DestructiveChangeError,
   assertSchemaWrite,
+  DestructiveChangeError,
   getCollectionBySlug,
   parseBearerApiKey,
   publishNewVersion,
@@ -52,10 +52,10 @@ async function handle(request: Request): Promise<Response> {
   try {
     assertSchemaWrite(apiKey.scopes);
   } catch (e) {
-    return new Response(
-      JSON.stringify({ error: (e as Error).message }),
-      { status: 403, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: (e as Error).message }), {
+      status: 403,
+      headers: { "content-type": "application/json" },
+    });
   }
 
   const body = await request.json().catch(() => null);
@@ -112,10 +112,10 @@ async function handle(request: Request): Promise<Response> {
         { status: 409, headers: { "content-type": "application/json" } },
       );
     }
-    return new Response(
-      JSON.stringify({ error: (e as Error).message }),
-      { status: 500, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: (e as Error).message }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 

@@ -1,8 +1,4 @@
-import {
-  ApiKeyCreateDialog,
-  Badge,
-  Button,
-} from "@kitsune/ui";
+import { ApiKeyCreateDialog, Badge, Button } from "@kitsune/ui";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -38,50 +34,59 @@ function ApiKeysPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <header className="flex items-end justify-between">
+    <>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">API keys</h1>
-          <p className="text-sm text-muted-foreground">
-            Delivery and CLI clients authenticate with these Bearer tokens.
+          <p className="admin-eyebrow mb-2">Chapter 04 · Delivery</p>
+          <h1 className="admin-heading">API keys</h1>
+          <p className="mt-2 max-w-xl text-sm text-[var(--sea-ink-soft)]">
+            Delivery clients and CLIs authenticate with these Bearer tokens.
+            You'll see the full value exactly once on creation — store it
+            somewhere safe.
           </p>
         </div>
-        <Button onClick={() => setOpen(true)}>Create key</Button>
+        <Button variant="ember" onClick={() => setOpen(true)}>
+          Create key
+        </Button>
       </header>
 
-      <ul className="divide-y rounded-lg border">
+      <ul className="admin-card divide-y divide-[color-mix(in_oklab,var(--line)_80%,transparent)] overflow-hidden p-0">
         {keys.length === 0 ? (
-          <li className="px-4 py-6 text-center text-sm text-muted-foreground">
+          <li className="px-6 py-10 text-center text-sm text-[var(--sea-ink-soft)]">
             No API keys yet.
           </li>
         ) : null}
         {keys.map((k) => (
           <li
             key={k.id}
-            className="flex items-center gap-3 px-4 py-3 text-sm"
+            className="flex flex-wrap items-center gap-3 px-5 py-3.5 text-sm"
           >
             <div className="flex flex-col">
-              <span className="font-medium">{k.name}</span>
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="font-medium text-[var(--sea-ink)]">
+                {k.name}
+              </span>
+              <span className="font-mono text-[11.5px] text-[var(--sea-ink-soft)]">
                 {k.keyPrefix}
               </span>
             </div>
-            <div className="ml-3 flex gap-1">
+            <div className="ml-3 flex flex-wrap gap-1">
               {k.scopes.readOnly ? (
                 <Badge variant="secondary">read</Badge>
               ) : null}
-              {k.scopes.write ? <Badge>write</Badge> : null}
+              {k.scopes.write ? <Badge variant="lagoon">write</Badge> : null}
               {k.scopes.schemaWrite ? (
-                <Badge variant="outline">schema</Badge>
+                <Badge variant="ember">schema</Badge>
               ) : null}
               {k.revokedAt ? (
                 <Badge variant="destructive">revoked</Badge>
               ) : null}
             </div>
-            <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-              {k.lastUsedAt
-                ? `used ${new Date(k.lastUsedAt).toLocaleDateString()}`
-                : "never used"}
+            <div className="ml-auto flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--sea-ink-soft)]">
+              <span>
+                {k.lastUsedAt
+                  ? `used ${new Date(k.lastUsedAt).toLocaleDateString()}`
+                  : "never used"}
+              </span>
               {!k.revokedAt ? (
                 <Button
                   size="sm"
@@ -101,6 +106,6 @@ function ApiKeysPage() {
         onOpenChange={setOpen}
         onCreate={create}
       />
-    </div>
+    </>
   );
 }
