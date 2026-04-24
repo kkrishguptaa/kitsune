@@ -1,11 +1,6 @@
 {
   "name": "kitsune",
   "private": true,
-  "pnpm": {
-    "overrides": {
-      "esbuild": "0.27.7"
-    }
-  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -14,7 +9,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "@biomejs/biome": "2.4.13",
     "turbo": "^2.9.6",
     "typescript": "5.9.2"
   },
