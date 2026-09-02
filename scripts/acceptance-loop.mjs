@@ -17,7 +17,7 @@ while (true) {
   const failMatch = output.match(/Tests\s+.*?(\d+) failed/);
   const passCount = passMatch ? Number.parseInt(passMatch[1], 10) : 0;
   const failCount = failMatch ? Number.parseInt(failMatch[1], 10) : 0;
-  const total = 22;
+  const total = 59;
   const mainPassing = failCount === 0 && passCount >= total;
   console.log(
     `iteration ${iteration} — ${mainPassing ? total : passCount}/${total} passing — fixed: (see failures)`,

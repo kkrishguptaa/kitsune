@@ -25,7 +25,12 @@ export default function LandingPage() {
         </p>
         <ul>
           <li>
-            <a href="https://github.com/withciel/kitsuneos">49 passing acceptance tests</a>
+            <a
+              href="https://github.com/withciel/kitsuneos"
+              aria-label="KitsuneOS on GitHub — 56 passing acceptance tests"
+            >
+              56 passing acceptance tests
+            </a>
           </li>
           <li>Cross-tenant isolation verified by named Gate 0b tests</li>
         </ul>
@@ -51,10 +56,19 @@ export default function LandingPage() {
 
       <section id="proof">
         <h2>Proof</h2>
-        <div className="proof-placeholder" aria-label="Demo video placeholder">
-          30-second demo recording — agent proposes next_step, amount rejected, human approves,
-          history shows attribution (coming after review UI ships).
-        </div>
+        <video
+          className="proof-video"
+          controls
+          preload="metadata"
+          poster="/proof-poster.svg"
+          aria-label="Demo: agent proposes next_step, amount rejected, human approves, history shows attribution"
+        >
+          <source src="/proof-demo.mp4" type="video/mp4" />
+          <p>
+            30-second demo: agent proposes <code>next_step</code>, <code>amount</code> rejected,
+            human approves in the review queue, history shows agent attribution.
+          </p>
+        </video>
       </section>
 
       <section id="limitations">

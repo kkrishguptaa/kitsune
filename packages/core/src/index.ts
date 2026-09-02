@@ -21,3 +21,15 @@ export {
   validateCollectionDefinition,
   validateFieldDefinition,
 } from './schema/validate-definition.js';
+export {
+  assertWriteEntitlement,
+  loadWorkspaceSubscriptionStatus,
+  statusGrantsWrite,
+} from './billing/entitlement.js';
+export type { SubscriptionStatus } from './billing/entitlement.js';
+export {
+  findWorkspaceByDodoCustomer,
+  recordBillingEvent,
+  recordUsageEvent,
+  upsertSubscription,
+} from './billing/store.js';

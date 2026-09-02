@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -9,7 +10,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="site-footer">
+          <nav aria-label="Legal and support">
+            <Link href="/terms/">Terms</Link>
+            {' · '}
+            <Link href="/privacy/">Privacy</Link>
+            {' · '}
+            <Link href="/refund/">Refunds</Link>
+            {' · '}
+            <a href="mailto:support@kitsuneos.com">support@kitsuneos.com</a>
+          </nav>
+        </footer>
+      </body>
     </html>
   );
 }
