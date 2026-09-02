@@ -10,13 +10,19 @@ export function getDodoClient(): DodoPayments | null {
   if (!client) {
     client = new DodoPayments({
       bearerToken: apiKey,
-      environment: process.env.DODO_PAYMENTS_ENVIRONMENT === 'live_mode' ? 'live_mode' : 'test_mode',
+      environment:
+        process.env.DODO_PAYMENTS_ENVIRONMENT === 'live_mode'
+          ? 'live_mode'
+          : 'test_mode',
     });
   }
   return client;
 }
 
-export function mapDodoSubscriptionStatus(eventType: string, payloadStatus?: string): string {
+export function mapDodoSubscriptionStatus(
+  eventType: string,
+  payloadStatus?: string,
+): string {
   if (payloadStatus) {
     return payloadStatus.replace('subscription.', '');
   }

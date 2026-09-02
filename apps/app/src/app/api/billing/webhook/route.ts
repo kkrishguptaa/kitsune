@@ -1,18 +1,39 @@
 // workspace-lint: ignore — webhook metadata maps Dodo customer to provisioned workspace.
-import { NextResponse } from 'next/server';
-import { Webhook } from 'standardwebhooks';
 import {
   findWorkspaceByDodoCustomer,
+  processSubscriptionWebhook,
   recordBillingEvent,
-  upsertSubscription,
 } from '@kitsuneos/core';
+import { NextResponse } from 'next/server';
+import { Webhook } from 'standardwebhooks';
 import { mapDodoSubscriptionStatus } from '@/lib/dodo';
 import { engine } from '@/lib/engine';
+
+function parseWebhookEvent(verified: unknown): {
+  type: string;
+  data: Record<string, unknown>;
+} {
+  if (typeof verified !== 'object' || verified === null) {
+    throw new Error('Invalid webhook payload');
+  }
+  const event = verified as { type?: unknown; data?: unknown };
+  if (
+    typeof event.type !== 'string' ||
+    typeof event.data !== 'object' ||
+    event.data === null
+  ) {
+    throw new Error('Invalid webhook event shape');
+  }
+  return { type: event.type, data: event.data as Record<string, unknown> };
+}
 
 export async function POST(request: Request) {
   const webhookKey = process.env.DODO_PAYMENTS_WEBHOOK_KEY;
   if (!webhookKey) {
-    return NextResponse.json({ error: 'Webhook key not configured' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Webhook key not configured' },
+      { status: 503 },
+    );
   }
 
   const rawBody = await request.text();
@@ -28,20 +49,22 @@ export async function POST(request: Request) {
       'webhook-signature': webhookSignature,
       'webhook-timestamp': webhookTimestamp,
     });
-    event = JSON.parse(String(verified)) as { type: string; data: Record<string, unknown> };
+    event = parseWebhookEvent(verified);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: message }, { status: 401 });
   }
 
-  const eventId = webhookId || `${event.type}:${JSON.stringify(event.data).slice(0, 64)}`;
-  const isNew = await recordBillingEvent(engine.ownerPool, eventId, event);
-  if (!isNew) {
-    return NextResponse.json({ received: true, duplicate: true });
-  }
+  const eventId =
+    webhookId || `${event.type}:${JSON.stringify(event.data).slice(0, 64)}`;
 
   if (!event.type.startsWith('subscription.')) {
-    return NextResponse.json({ received: true, ignored: true });
+    const isNew = await recordBillingEvent(engine.ownerPool, eventId, event);
+    return NextResponse.json({
+      received: true,
+      duplicate: !isNew,
+      ignored: true,
+    });
   }
 
   const subscription = event.data as {
@@ -51,27 +74,34 @@ export async function POST(request: Request) {
     metadata?: { kitsune_workspace?: string; workspace_id?: string };
   };
 
-  const status = mapDodoSubscriptionStatus(
-    event.type,
-    subscription.status ?? event.type,
-  ) as Parameters<typeof upsertSubscription>[1]['status'];
+  const status = mapDodoSubscriptionStatus(event.type, subscription.status);
 
   let workspaceId =
     subscription.metadata?.kitsune_workspace ??
     subscription.metadata?.workspace_id ??
     null;
   if (!workspaceId && subscription.customer_id) {
-    workspaceId = await findWorkspaceByDodoCustomer(engine.ownerPool, subscription.customer_id);
+    workspaceId = await findWorkspaceByDodoCustomer(
+      engine.ownerPool,
+      subscription.customer_id,
+    );
   }
 
-  if (workspaceId && subscription.subscription_id) {
-    await upsertSubscription(engine.ownerPool, {
-      workspaceId,
-      dodoSubscriptionId: subscription.subscription_id,
-      dodoCustomerId: subscription.customer_id ?? null,
-      status,
-    });
-  }
+  const webhookAt = new Date(
+    webhookTimestamp && !Number.isNaN(Number(webhookTimestamp))
+      ? Number(webhookTimestamp) * 1000
+      : Date.now(),
+  );
 
-  return NextResponse.json({ received: true });
+  const result = await processSubscriptionWebhook(engine.ownerPool, {
+    eventId,
+    payload: event,
+    workspaceId,
+    dodoSubscriptionId: subscription.subscription_id ?? null,
+    dodoCustomerId: subscription.customer_id ?? null,
+    status,
+    webhookAt,
+  });
+
+  return NextResponse.json({ received: true, result });
 }

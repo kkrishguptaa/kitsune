@@ -14,7 +14,9 @@ export type SubscriptionStatus =
 
 const WRITE_STATUSES = new Set<SubscriptionStatus>(['active', 'on_hold']);
 
-export function statusGrantsWrite(status: SubscriptionStatus | null | undefined): boolean {
+export function statusGrantsWrite(
+  status: SubscriptionStatus | null | undefined,
+): boolean {
   if (!status) {
     return true;
   }

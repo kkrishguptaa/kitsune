@@ -1056,6 +1056,7 @@ export class KitsuneEngine {
     record: Record<string, JsonValue>,
     options?: { recordId?: string },
   ): Promise<string> {
+    await assertWriteEntitlement(this.ownerPool, workspaceId);
     const schemaName = schemaNameForWorkspace(workspaceId);
     const client = await this.appPool.connect();
     try {

@@ -1,8 +1,9 @@
 // workspace-lint: ignore — workspace resolved via requireWorkspace(); SQL uses kitsune schema column names.
-import { NextResponse } from 'next/server';
-import { requireWorkspace } from '@/lib/require-workspace';
-import { engine } from '@/lib/engine';
+
 import type { JsonValue } from '@kitsuneos/core';
+import { NextResponse } from 'next/server';
+import { engine } from '@/lib/engine';
+import { requireWorkspace } from '@/lib/require-workspace';
 
 interface ChangeSetSummary {
   id: string;
@@ -85,10 +86,16 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ changeSets: summaries });
+    return NextResponse.json(
+      { changeSets: summaries },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const status = message.includes('Unauthorized') ? 401 : 400;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json(
+      { error: message },
+      { status, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 }

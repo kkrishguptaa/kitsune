@@ -8,8 +8,9 @@ cd "$ROOT"
 pnpm --filter @kitsuneos/core build
 
 cd "$ROOT/infra"
-ADMIN_URL=$(aws secretsmanager get-secret-value --secret-id "$(pulumi stack output ownerDbSecretArn -s "$STACK")" --query SecretString --output text)
-APP_URL=$(aws secretsmanager get-secret-value --secret-id "$(pulumi stack output appDbSecretArn -s "$STACK")" --query SecretString --output text)
+REGION="${AWS_REGION:-$(pulumi config get aws:region -s "$STACK" 2>/dev/null || echo us-east-1)}"
+ADMIN_URL=$(aws secretsmanager get-secret-value --region "$REGION" --secret-id "$(pulumi stack output ownerDbSecretArn -s "$STACK")" --query SecretString --output text)
+APP_URL=$(aws secretsmanager get-secret-value --region "$REGION" --secret-id "$(pulumi stack output appDbSecretArn -s "$STACK")" --query SecretString --output text)
 
 OWNER_PW=$(node -e "console.log(new URL(process.argv[1]).password)" "$ADMIN_URL")
 APP_PW=$(node -e "console.log(new URL(process.argv[1]).password)" "$APP_URL")

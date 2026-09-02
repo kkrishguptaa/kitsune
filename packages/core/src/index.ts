@@ -29,7 +29,12 @@ export {
 export type { SubscriptionStatus } from './billing/entitlement.js';
 export {
   findWorkspaceByDodoCustomer,
+  processSubscriptionWebhook,
   recordBillingEvent,
   recordUsageEvent,
   upsertSubscription,
+} from './billing/store.js';
+export type {
+  ProcessSubscriptionWebhookInput,
+  SubscriptionWebhookResult,
 } from './billing/store.js';

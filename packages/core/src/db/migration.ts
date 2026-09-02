@@ -170,10 +170,14 @@ CREATE TABLE IF NOT EXISTS kitsune.subscriptions (
   status                text NOT NULL CHECK (status IN
                           ('pending','active','on_hold','paused','cancelled','failed','expired','past_due')),
   created_at            timestamptz NOT NULL DEFAULT now(),
-  updated_at            timestamptz NOT NULL DEFAULT now()
+  updated_at            timestamptz NOT NULL DEFAULT now(),
+  last_webhook_at       timestamptz
 );
 CREATE INDEX IF NOT EXISTS subscriptions_workspace_idx
   ON kitsune.subscriptions (workspace_id, created_at DESC);
+
+ALTER TABLE kitsune.subscriptions
+  ADD COLUMN IF NOT EXISTS last_webhook_at timestamptz;
 
 CREATE TABLE IF NOT EXISTS kitsune.billing_events (
   event_id       text PRIMARY KEY,

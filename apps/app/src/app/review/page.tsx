@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { ActionConsent, type ConsentAction } from '@kitsuneos/ui';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ChangeSetResponse {
   changeSets: Array<{
@@ -22,24 +22,31 @@ interface ChangeSetResponse {
 }
 
 export default function ReviewPage() {
-  const [changeSets, setChangeSets] = useState<ChangeSetResponse['changeSets']>([]);
+  const [changeSets, setChangeSets] = useState<ChangeSetResponse['changeSets']>(
+    [],
+  );
   const [activeIndex, setActiveIndex] = useState(0);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
   const loadQueue = useCallback(async () => {
     setLoading(true);
-    const response = await fetch('/api/review');
-    if (!response.ok) {
-      setMessage('Sign in to view the review queue.');
+    try {
+      const response = await fetch('/api/review');
+      if (!response.ok) {
+        setMessage('Sign in to view the review queue.');
+        setChangeSets([]);
+        return;
+      }
+      const data = (await response.json()) as ChangeSetResponse;
+      setChangeSets(data.changeSets);
+      setActiveIndex(0);
+    } catch {
+      setMessage('Could not load the review queue.');
       setChangeSets([]);
+    } finally {
       setLoading(false);
-      return;
     }
-    const data = (await response.json()) as ChangeSetResponse;
-    setChangeSets(data.changeSets);
-    setActiveIndex(0);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -48,24 +55,35 @@ export default function ReviewPage() {
 
   const active = changeSets[activeIndex];
 
-  async function handleDecision(action: 'approve' | 'reject' | 'apply') {
-    if (!active) return;
-    const response = await fetch('/api/review', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ changeSetId: active.id, action }),
-    });
-    const body = (await response.json()) as { error?: string; status?: string };
-    if (!response.ok) {
-      setMessage(body.error ?? 'Request failed');
-      return;
+  async function handleDecision(
+    action: 'approve' | 'reject' | 'apply',
+  ): Promise<boolean> {
+    if (!active) return false;
+    try {
+      const response = await fetch('/api/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changeSetId: active.id, action }),
+      });
+      const body = (await response.json()) as {
+        error?: string;
+        status?: string;
+      };
+      if (!response.ok) {
+        setMessage(body.error ?? 'Request failed');
+        return false;
+      }
+      setMessage(
+        action === 'apply'
+          ? `Applied: ${body.status ?? 'done'}`
+          : `${action === 'approve' ? 'Approved' : 'Rejected'} operations.`,
+      );
+      await loadQueue();
+      return true;
+    } catch {
+      setMessage('Request failed');
+      return false;
     }
-    setMessage(
-      action === 'apply'
-        ? `Applied: ${body.status ?? 'done'}`
-        : `${action === 'approve' ? 'Approved' : 'Rejected'} operations.`,
-    );
-    await loadQueue();
   }
 
   if (loading) {
@@ -125,8 +143,10 @@ export default function ReviewPage() {
         scope="write"
         onApprove={() => {
           void (async () => {
-            await handleDecision('approve');
-            await handleDecision('apply');
+            const approved = await handleDecision('approve');
+            if (approved) {
+              await handleDecision('apply');
+            }
           })();
         }}
         onDecline={() => void handleDecision('reject')}

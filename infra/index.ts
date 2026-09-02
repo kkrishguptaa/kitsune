@@ -68,6 +68,27 @@ new aws.ec2.RouteTableAssociation('public-b-rta', {
   routeTableId: publicRouteTable.id,
 });
 
+const natEip = new aws.ec2.Eip('nat-eip', { domain: 'vpc', tags });
+const natGateway = new aws.ec2.NatGateway('nat', {
+  allocationId: natEip.id,
+  subnetId: publicSubnetA.id,
+  tags,
+});
+
+const privateRouteTable = new aws.ec2.RouteTable('private-rt', {
+  vpcId: vpc.id,
+  routes: [{ cidrBlock: '0.0.0.0/0', natGatewayId: natGateway.id }],
+  tags,
+});
+new aws.ec2.RouteTableAssociation('private-a-rta', {
+  subnetId: privateSubnetA.id,
+  routeTableId: privateRouteTable.id,
+});
+new aws.ec2.RouteTableAssociation('private-b-rta', {
+  subnetId: privateSubnetB.id,
+  routeTableId: privateRouteTable.id,
+});
+
 const dbSubnetGroup = new aws.rds.SubnetGroup('db-subnets', {
   subnetIds: [privateSubnetA.id, privateSubnetB.id],
   tags,
@@ -76,7 +97,9 @@ const dbSubnetGroup = new aws.rds.SubnetGroup('db-subnets', {
 const appRunnerSg = new aws.ec2.SecurityGroup('apprunner-sg', {
   vpcId: vpc.id,
   description: 'App Runner VPC connector egress',
-  egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+  egress: [
+    { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+  ],
   tags,
 });
 
@@ -91,7 +114,9 @@ const dbSecurityGroup = new aws.ec2.SecurityGroup('db-sg', {
       securityGroups: [appRunnerSg.id],
     },
   ],
-  egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+  egress: [
+    { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+  ],
   tags,
 });
 
@@ -139,7 +164,8 @@ new aws.secretsmanager.SecretVersion('app-db-url-v', {
 });
 
 const workosSecret = new aws.secretsmanager.Secret('workos-keys', {
-  description: 'WorkOS API key, client ID, cookie password (set manually or via deploy)',
+  description:
+    'WorkOS API key, client ID, cookie password (set manually or via deploy)',
   tags,
 });
 new aws.secretsmanager.SecretVersion('workos-keys-v', {
@@ -165,7 +191,9 @@ new aws.secretsmanager.SecretVersion('dodo-keys-v', {
   }),
 });
 
-const dodoWebhookSecret = new aws.secretsmanager.Secret('dodo-webhook-secret', { tags });
+const dodoWebhookSecret = new aws.secretsmanager.Secret('dodo-webhook-secret', {
+  tags,
+});
 
 // --- ACM certificates (us-east-1) ---
 const siteCert = new aws.acm.Certificate('site-cert', {
@@ -202,12 +230,15 @@ const siteValidation1 = certValidationRecord(siteCert, 'site-validation-1', 1);
 
 const appValidation0 = certValidationRecord(appCert, 'app-validation-0', 0);
 
-const siteCertValidated = new aws.acm.CertificateValidation('site-cert-validated', {
-  certificateArn: siteCert.arn,
-  validationRecordFqdns: [siteValidation0.fqdn, siteValidation1.fqdn],
-});
+const siteCertValidated = new aws.acm.CertificateValidation(
+  'site-cert-validated',
+  {
+    certificateArn: siteCert.arn,
+    validationRecordFqdns: [siteValidation0.fqdn, siteValidation1.fqdn],
+  },
+);
 
-const appCertValidated = new aws.acm.CertificateValidation('app-cert-validated', {
+new aws.acm.CertificateValidation('app-cert-validated', {
   certificateArn: appCert.arn,
   validationRecordFqdns: [appValidation0.fqdn],
 });
@@ -269,20 +300,22 @@ const siteDistribution = new aws.cloudfront.Distribution('site-cdn', {
 
 new aws.s3.BucketPolicy('site-bucket-policy', {
   bucket: siteBucket.id,
-  policy: pulumi.all([siteBucket.arn, siteDistribution.arn]).apply(([bucketArn, distArn]) =>
-    JSON.stringify({
-      Version: '2012-10-17',
-      Statement: [
-        {
-          Effect: 'Allow',
-          Principal: { Service: 'cloudfront.amazonaws.com' },
-          Action: 's3:GetObject',
-          Resource: `${bucketArn}/*`,
-          Condition: { StringEquals: { 'AWS:SourceArn': distArn } },
-        },
-      ],
-    }),
-  ),
+  policy: pulumi
+    .all([siteBucket.arn, siteDistribution.arn])
+    .apply(([bucketArn, distArn]) =>
+      JSON.stringify({
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Principal: { Service: 'cloudfront.amazonaws.com' },
+            Action: 's3:GetObject',
+            Resource: `${bucketArn}/*`,
+            Condition: { StringEquals: { 'AWS:SourceArn': distArn } },
+          },
+        ],
+      }),
+    ),
 });
 
 new aws.route53.Record('site-a', {
@@ -335,7 +368,13 @@ const appRunnerRole = new aws.iam.Role('apprunner-instance-role', {
 new aws.iam.RolePolicy('apprunner-secrets-policy', {
   role: appRunnerRole.id,
   policy: pulumi
-    .all([ownerSecret.arn, appSecret.arn, workosSecret.arn, dodoSecret.arn, dodoWebhookSecret.arn])
+    .all([
+      ownerSecret.arn,
+      appSecret.arn,
+      workosSecret.arn,
+      dodoSecret.arn,
+      dodoWebhookSecret.arn,
+    ])
     .apply((arns) =>
       JSON.stringify({
         Version: '2012-10-17',
@@ -408,10 +447,35 @@ const appRunnerService = new aws.apprunner.Service('app-service', {
   tags,
 });
 
-const appRunnerCustomDomain = new aws.apprunner.CustomDomainAssociation('app-domain', {
-  domainName: appDomain,
-  serviceArn: appRunnerService.arn,
-  enableWwwSubdomain: false,
+const appRunnerCustomDomain = new aws.apprunner.CustomDomainAssociation(
+  'app-domain',
+  {
+    domainName: appDomain,
+    serviceArn: appRunnerService.arn,
+    enableWwwSubdomain: false,
+  },
+);
+
+appRunnerCustomDomain.certificateValidationRecords.apply((records) =>
+  records.map(
+    (record, index) =>
+      new aws.route53.Record(`app-domain-cert-${index}`, {
+        zoneId: zone.zoneId,
+        name: record.name,
+        type: record.type,
+        records: [record.value],
+        ttl: 60,
+        allowOverwrite: true,
+      }),
+  ),
+);
+
+new aws.route53.Record('app-domain-cname', {
+  zoneId: zone.zoneId,
+  name: appDomain,
+  type: 'CNAME',
+  ttl: 300,
+  records: [appRunnerCustomDomain.dnsTarget],
 });
 
 // --- CloudWatch alarms ---

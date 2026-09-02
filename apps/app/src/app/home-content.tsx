@@ -14,7 +14,9 @@ export default function HomeContent() {
           setError('Sign in to manage your workspace.');
           return;
         }
-        const data = (await response.json()) as { apiKeyPlaintext?: string | null };
+        const data = (await response.json()) as {
+          apiKeyPlaintext?: string | null;
+        };
         if (data.apiKeyPlaintext) {
           setApiKey(data.apiKeyPlaintext);
         }

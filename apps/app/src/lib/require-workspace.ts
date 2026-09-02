@@ -31,9 +31,10 @@ async function lookupUser(
     id: string;
     workspace_id: string;
     principal_id: string;
-  }>(`SELECT id, workspace_id, principal_id FROM kitsune.users WHERE workos_id = $1`, [
-    workosId,
-  ]);
+  }>(
+    `SELECT id, workspace_id, principal_id FROM kitsune.users WHERE workos_id = $1`,
+    [workosId],
+  );
   if (!row.rows[0]) {
     return null;
   }
@@ -48,7 +49,7 @@ async function lookupUser(
 export async function requireWorkspace(): Promise<WorkspaceContext> {
   const headerStore = await headers();
   const testUser = headerStore.get('x-kitsune-test-user');
-  if (testUser) {
+  if (testUser && process.env.KITSUNE_ALLOW_TEST_USER_HEADER === '1') {
     const engine = getEngine();
     const ctx = await lookupUser(engine, testUser);
     if (!ctx) {

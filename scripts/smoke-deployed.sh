@@ -7,16 +7,21 @@ set -euo pipefail
 : "${DEPLOYED_APP_URL:?Set DEPLOYED_APP_URL e.g. https://app.kitsuneos.com}"
 : "${DEPLOYED_API_KEY:?Set DEPLOYED_API_KEY}"
 
-MCP_URL="${DEPLOYED_APP_URL%/}/api/mcp/tools/call"
+if [[ "${DEPLOYED_APP_URL}" != https://* ]]; then
+  echo "DEPLOYED_APP_URL must use https://" >&2
+  exit 1
+fi
 
-curl -sf "${DEPLOYED_APP_URL%/}/health" >/dev/null
+MCP_URL="${DEPLOYED_APP_URL%/}/api/mcp/tools/call"
+CURL_OPTS=(--connect-timeout 10 --max-time 30 -sf)
+
+curl "${CURL_OPTS[@]}" "${DEPLOYED_APP_URL%/}/health" >/dev/null
 echo "Health OK"
 
-curl -sf -X POST "$MCP_URL" \
+curl "${CURL_OPTS[@]}" -X POST "$MCP_URL" \
   -H "Authorization: Bearer $DEPLOYED_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"tool":"describe_schema","arguments":{}}'
 
 echo ""
 echo "Deployed smoke passed."
-

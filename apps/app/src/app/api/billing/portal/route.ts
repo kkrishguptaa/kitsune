@@ -1,18 +1,23 @@
 // workspace-lint: ignore — workspace resolved via requireWorkspace(); SQL uses kitsune schema column names.
 import { NextResponse } from 'next/server';
-import { requireWorkspace } from '@/lib/require-workspace';
 import { getDodoClient } from '@/lib/dodo';
 import { engine } from '@/lib/engine';
+import { requireWorkspace } from '@/lib/require-workspace';
 
 export async function GET() {
   try {
     const ctx = await requireWorkspace();
     const client = getDodoClient();
     if (!client) {
-      return NextResponse.json({ error: 'Billing not configured' }, { status: 503 });
+      return NextResponse.json(
+        { error: 'Billing not configured' },
+        { status: 503 },
+      );
     }
 
-    const sub = await engine.ownerPool.query<{ dodo_customer_id: string | null }>(
+    const sub = await engine.ownerPool.query<{
+      dodo_customer_id: string | null;
+    }>(
       `SELECT dodo_customer_id FROM kitsune.subscriptions
         WHERE workspace_id = $1 AND dodo_customer_id IS NOT NULL
         ORDER BY created_at DESC LIMIT 1`,
