@@ -29,6 +29,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: "8080"
+      HOSTNAME: "0.0.0.0"
       KITSUNE_OWNER_URL: postgresql://kitsune_owner:kitsune_owner@127.0.0.1:5432/kitsune
       KITSUNE_APP_URL: postgresql://kitsune_app:kitsune_app@127.0.0.1:5432/kitsune
       KITSUNE_ALLOW_TEST_USER_HEADER: "1"
