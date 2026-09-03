@@ -112,8 +112,19 @@ jobs:
             exit 1
           fi
 
+      - name: Resolve AWS auth mode
+        id: aws_auth
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+        run: |
+          if [ -n "$AWS_ROLE_ARN" ]; then
+            echo "mode=oidc" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=keys" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Configure AWS (OIDC)
-        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        if: steps.aws_auth.outputs.mode == 'oidc'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -121,7 +132,7 @@ jobs:
           role-session-name: kitsuneos-cd
 
       - name: Configure AWS (access keys)
-        if: ${{ secrets.AWS_ROLE_ARN == '' }}
+        if: steps.aws_auth.outputs.mode == 'keys'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
