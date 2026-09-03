@@ -19,7 +19,7 @@ export class KitsuneClient {
     query: string,
     variables?: Record<string, unknown>,
   ): Promise<T> {
-    const response = await this.fetchImpl(`${this.baseUrl}/graphql`, {
+    const response = await this.fetchImpl(`${this.baseUrl}/api/graphql`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.apiKey}`,

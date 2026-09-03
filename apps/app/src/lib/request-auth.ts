@@ -12,8 +12,8 @@ export async function resolveRequestAuth(
   request: Request,
 ): Promise<RequestAuth> {
   const authorization = request.headers.get('authorization');
-  if (authorization?.startsWith('Bearer ')) {
-    const token = authorization.slice('Bearer '.length).trim();
+  if (authorization?.toLowerCase().startsWith('bearer ')) {
+    const token = authorization.slice(authorization.indexOf(' ') + 1).trim();
     const cred = await resolveApiKey(engine.ownerPool, token);
     return {
       workspaceId: cred.workspaceId,

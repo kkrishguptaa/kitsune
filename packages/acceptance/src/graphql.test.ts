@@ -156,7 +156,7 @@ describe('GraphQL and REST reads', () => {
   });
 
   it('API-key GraphQL cannot select a masked amount field', async () => {
-    const response = await fetch(`${baseUrl}/graphql`, {
+    const response = await fetch(`${baseUrl}/api/graphql`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${agentKey}`,
