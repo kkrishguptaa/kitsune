@@ -1,7 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Fraunces, IBM_Plex_Mono, Outfit } from 'next/font/google';
+import Link from 'next/link';
+import type { CSSProperties, ReactNode } from 'react';
 import './globals.css';
 
 const display = Fraunces({

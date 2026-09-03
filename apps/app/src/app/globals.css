@@ -172,7 +172,8 @@ a:hover {
   padding: 0.7rem 1.15rem;
   color: var(--k-ink);
   background: color-mix(in srgb, var(--k-accent) 22%, var(--k-surface-raised));
-  border: 1px solid color-mix(in srgb, var(--k-accent) 45%, var(--k-border-control));
+  border: 1px solid
+    color-mix(in srgb, var(--k-accent) 45%, var(--k-border-control));
   border-radius: var(--k-radius-md);
   cursor: pointer;
   transition:

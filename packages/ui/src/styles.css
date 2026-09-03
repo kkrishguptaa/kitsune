@@ -108,7 +108,11 @@
 .k-action-consent__approve {
   background: color-mix(in srgb, var(--k-applied) 28%, var(--k-surface));
   color: var(--k-ink);
-  border-color: color-mix(in srgb, var(--k-applied) 45%, var(--k-border-control));
+  border-color: color-mix(
+    in srgb,
+    var(--k-applied) 45%,
+    var(--k-border-control)
+  );
 }
 
 .k-action-consent__decline {

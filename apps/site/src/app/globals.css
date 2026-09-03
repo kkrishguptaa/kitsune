@@ -31,17 +31,8 @@ body::before {
       var(--k-glow-amber),
       transparent 58%
     ),
-    radial-gradient(
-      40rem 34rem at 0% 100%,
-      var(--k-glow-bone),
-      transparent 50%
-    ),
-    linear-gradient(
-      160deg,
-      #1c1915 0%,
-      var(--k-surface) 45%,
-      #26221c 100%
-    );
+    radial-gradient(40rem 34rem at 0% 100%, var(--k-glow-bone), transparent 50%),
+    linear-gradient(160deg, #1c1915 0%, var(--k-surface) 45%, #26221c 100%);
 }
 
 .site-shell {

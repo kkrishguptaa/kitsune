@@ -33,7 +33,10 @@ export default function HomeContent() {
       </p>
       <p className="lede">Agents propose. You approve.</p>
       {apiKey ? (
-        <section className="panel api-key-panel" aria-labelledby="api-key-heading">
+        <section
+          className="panel api-key-panel"
+          aria-labelledby="api-key-heading"
+        >
           <h2 id="api-key-heading">Your API key</h2>
           <p>Copy this key now. It will not be shown again.</p>
           <code>{apiKey}</code>

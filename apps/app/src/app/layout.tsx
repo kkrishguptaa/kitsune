@@ -1,6 +1,6 @@
-import type { CSSProperties, ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { Fraunces, IBM_Plex_Mono, Outfit } from 'next/font/google';
+import type { CSSProperties, ReactNode } from 'react';
 import '@kitsuneos/ui/styles.css';
 import './globals.css';
 
