@@ -1,7 +1,7 @@
 # KitsuneOS v1 — System Design
 
-**Status:** P0 surfaces implemented (2026-09-02). pgvector / object-storage attachments remain P1.
-**Date:** 2 September 2026
+**Status:** P0 surfaces implemented (2026-09-02). Human console IA shipped (2026-09-03). pgvector / object-storage attachments remain P1.
+**Date:** 3 September 2026
 **Companion to:** KitsuneOS v1 PRD
 **Scope:** P0 requirements R1–R8, with architectural accommodation for P2 items R14–R17
 
@@ -9,13 +9,13 @@
 
 ## 1. Context
 
-KitsuneOS is an application database whose primitives assume AI agents are writers. Three things are native rather than bolted on:
+KitsuneOS is an application database humans and agents share. Humans use the hosted console; agents use MCP (and GraphQL / REST). Three things are native rather than bolted on:
 
 1. **Revisions.** Every write is historical and attributed.
 2. **Change sets.** A write can be proposed, reviewed, and applied atomically.
 3. **Grants.** Access control is field- and row-scoped, stored as data, enforced in the database.
 
-Applications are built on top. The reference CRM is one such application and gets no privileged access — it uses the same public API as any customer.
+The hosted console is a first-class human workspace (collection tables, Inbox, Settings). Starter CRM collections (`accounts`, `contacts`, `opportunities`) live in that workspace so a human can operate records on day one. They use the same public API as any customer application — they are a demo schema, not a separate product.
 
 The design goal that governs every trade-off below: **be genuinely relational.** If a developer's second query is "pipeline by stage this quarter" and we answer it slowly or not at all, none of the interesting primitives ever get used. Section 12 (ADR-002) is where this is decided.
 
@@ -59,16 +59,16 @@ The design goal that governs every trade-off below: **be genuinely relational.**
 
 ```
                        ┌──────────────────────────────────────┐
-   Agents ────MCP────► │                                      │
-   (Claude, Codex,     │            API Gateway               │
-    other)             │   authn · rate limit · routing       │
+   Humans ──console──► │                                      │
+   (tables, Inbox,     │            API Gateway               │
+    Settings)          │   authn · rate limit · routing       │
                        └───────────────────┬──────────────────┘
-   Applications ──────►                    │
-   (reference CRM,                         ▼
-    customer apps)     ┌──────────────────────────────────────┐
-                       │          Query Compiler              │
-   Console / CLI ─────►│  grant resolution → SQL predicates   │
-                       │  column projection · shape validation│
+   Agents ────MCP────►                     │
+   (Claude, Codex,                         ▼
+    other)             ┌──────────────────────────────────────┐
+   Applications ──────►│          Query Compiler              │
+   (GraphQL / REST /   │  grant resolution → SQL predicates   │
+    CLI)               │  column projection · shape validation│
                        └───────┬─────────────────┬────────────┘
                                │                 │
                      ┌─────────▼──────┐  ┌───────▼─────────────┐
