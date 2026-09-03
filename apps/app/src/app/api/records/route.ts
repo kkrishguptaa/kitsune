@@ -1,6 +1,7 @@
 import type { JsonValue } from '@kitsuneos/core';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
+import { jsonError } from '@/lib/http-error';
 import { requireWorkspace } from '@/lib/require-workspace';
 
 /** Create a record via directWrite (requires write/admin). */
@@ -27,8 +28,6 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ recordId });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    const status = message.includes('Unauthorized') ? 401 : 400;
-    return NextResponse.json({ error: message }, { status });
+    return jsonError(error);
   }
 }

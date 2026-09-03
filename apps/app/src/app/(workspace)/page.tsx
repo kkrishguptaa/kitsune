@@ -7,10 +7,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function WorkspaceHomePage() {
   const router = useRouter();
   const [empty, setEmpty] = useState(false);
+  const [needsAuth, setNeedsAuth] = useState(false);
 
   useEffect(() => {
     void fetch('/api/schema')
       .then(async (response) => {
+        if (response.status === 401) {
+          setNeedsAuth(true);
+          return;
+        }
         if (!response.ok) {
           setEmpty(true);
           return;
@@ -28,13 +33,33 @@ export default function WorkspaceHomePage() {
       .catch(() => setEmpty(true));
   }, [router]);
 
+  if (needsAuth) {
+    return (
+      <div className="flex flex-1 flex-col items-start gap-3 p-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+        <p className="max-w-md text-sm text-muted-foreground">
+          Your session is missing or expired. Sign in to open your workspace.
+        </p>
+        <a
+          href="/"
+          className="text-sm text-primary underline-offset-4 hover:underline"
+          onClick={(event) => {
+            event.preventDefault();
+            window.location.assign('/');
+          }}
+        >
+          Continue to sign in
+        </a>
+      </div>
+    );
+  }
+
   if (empty) {
     return (
       <div className="flex flex-1 flex-col items-start gap-3 p-8">
         <h1 className="text-2xl font-semibold tracking-tight">Workspace</h1>
         <p className="max-w-md text-sm text-muted-foreground">
-          No collections yet. Open Settings to define a collection, or sign in
-          so your workspace can provision.
+          No collections yet. Open Settings to define a collection.
         </p>
         <a
           href="/settings"

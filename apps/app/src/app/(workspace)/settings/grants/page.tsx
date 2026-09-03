@@ -73,32 +73,40 @@ export default function SettingsGrantsPage() {
 
   async function createGrant() {
     setError('');
-    const response = await fetch('/api/grants', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ principalId, collectionId, capability }),
-    });
-    const body = (await response.json()) as { error?: string };
-    if (!response.ok) {
-      setError(body.error ?? 'Create failed');
-      return;
+    try {
+      const response = await fetch('/api/grants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ principalId, collectionId, capability }),
+      });
+      const body = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(body.error ?? 'Create failed');
+        return;
+      }
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Create failed');
     }
-    await reload();
   }
 
   async function revoke(grantId: string) {
     setError('');
-    const response = await fetch('/api/grants', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ grantId }),
-    });
-    const body = (await response.json()) as { error?: string };
-    if (!response.ok) {
-      setError(body.error ?? 'Revoke failed');
-      return;
+    try {
+      const response = await fetch('/api/grants', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grantId }),
+      });
+      const body = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(body.error ?? 'Revoke failed');
+        return;
+      }
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Revoke failed');
     }
-    await reload();
   }
 
   return (

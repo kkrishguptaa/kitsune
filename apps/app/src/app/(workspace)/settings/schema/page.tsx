@@ -44,6 +44,7 @@ export default function SettingsSchemaPage() {
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldType, setNewFieldType] =
     useState<(typeof FIELD_TYPES)[number]>('text');
+  const [newEnumValues, setNewEnumValues] = useState('');
   const [newCollectionName, setNewCollectionName] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -71,27 +72,59 @@ export default function SettingsSchemaPage() {
 
   const current = collections.find((c) => c.name === selected);
 
+  async function mutateSchema(payload: Record<string, unknown>) {
+    const response = await fetch('/api/schema/mutate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const body = (await response.json()) as {
+      error?: string;
+      preview?: { incompatibleChangeSetIds?: string[] };
+      requiresConfirmation?: boolean;
+    };
+    if (
+      response.status === 409 &&
+      body.requiresConfirmation &&
+      body.preview?.incompatibleChangeSetIds?.length
+    ) {
+      const ids = body.preview.incompatibleChangeSetIds;
+      const ok = window.confirm(
+        `This change will mark ${ids.length} open change set(s) as stale. Continue?`,
+      );
+      if (!ok) throw new Error('Cancelled');
+      return mutateSchema({ ...payload, confirmStaleIds: ids });
+    }
+    if (!response.ok) throw new Error(body.error ?? 'Schema mutation failed');
+  }
+
   async function addField() {
     if (!selected || !newFieldName.trim()) return;
+    const enumValues =
+      newFieldType === 'enum'
+        ? newEnumValues
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean)
+        : [];
+    if (newFieldType === 'enum' && enumValues.length === 0) {
+      setError('Enum fields require at least one value');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api/schema/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          collection: selected,
-          op: 'addField',
-          field: {
-            name: newFieldName.trim(),
-            type: newFieldType,
-            ...(newFieldType === 'enum' ? { enumValues: ['a', 'b'] } : {}),
-          },
-        }),
+      await mutateSchema({
+        collection: selected,
+        op: 'addField',
+        field: {
+          name: newFieldName.trim(),
+          type: newFieldType,
+          ...(newFieldType === 'enum' ? { enumValues } : {}),
+        },
       });
-      const body = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(body.error ?? 'addField failed');
       setNewFieldName('');
+      setNewEnumValues('');
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -102,20 +135,18 @@ export default function SettingsSchemaPage() {
 
   async function dropField(fieldName: string) {
     if (!selected) return;
+    const ok = window.confirm(
+      `Drop field "${fieldName}" from ${selected}? This cannot be undone.`,
+    );
+    if (!ok) return;
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api/schema/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          collection: selected,
-          op: 'dropField',
-          fieldName,
-        }),
+      await mutateSchema({
+        collection: selected,
+        op: 'dropField',
+        fieldName,
       });
-      const body = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(body.error ?? 'dropField failed');
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -257,9 +288,22 @@ export default function SettingsSchemaPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                {newFieldType === 'enum' ? (
+                  <div className="space-y-1">
+                    <Label htmlFor="enum-values">Enum values</Label>
+                    <Input
+                      id="enum-values"
+                      value={newEnumValues}
+                      onChange={(e) => setNewEnumValues(e.target.value)}
+                      placeholder="open, won, lost"
+                    />
+                  </div>
+                ) : null}
                 <Button
                   size="sm"
-                  disabled={busy}
+                  disabled={
+                    busy || (newFieldType === 'enum' && !newEnumValues.trim())
+                  }
                   onClick={() => void addField()}
                 >
                   Add field

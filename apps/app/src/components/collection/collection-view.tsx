@@ -2,7 +2,7 @@
 
 import type { JsonValue } from '@kitsuneos/core';
 import { Columns3, Plus, Search } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,16 +44,16 @@ interface ViewState {
   search: string;
 }
 
-function storageKey(collection: string): string {
-  return `kitsune:view:${collection}`;
+function storageKey(scope: string, collection: string): string {
+  return `kitsune:view:${scope}:${collection}`;
 }
 
-function loadView(collection: string): ViewState {
+function loadView(scope: string, collection: string): ViewState {
   if (typeof window === 'undefined') {
     return { hiddenColumns: [], search: '' };
   }
   try {
-    const raw = window.localStorage.getItem(storageKey(collection));
+    const raw = window.localStorage.getItem(storageKey(scope, collection));
     if (!raw) return { hiddenColumns: [], search: '' };
     return JSON.parse(raw) as ViewState;
   } catch {
@@ -61,8 +61,11 @@ function loadView(collection: string): ViewState {
   }
 }
 
-function saveView(collection: string, state: ViewState): void {
-  window.localStorage.setItem(storageKey(collection), JSON.stringify(state));
+function saveView(scope: string, collection: string, state: ViewState): void {
+  window.localStorage.setItem(
+    storageKey(scope, collection),
+    JSON.stringify(state),
+  );
 }
 
 function cellText(value: JsonValue | undefined): string {
@@ -79,6 +82,7 @@ export function CollectionView({ collection }: { collection: string }) {
   const [rows, setRows] = useState<Array<Record<string, JsonValue>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [viewScope, setViewScope] = useState('anon');
   const [view, setView] = useState<ViewState>({
     hiddenColumns: [],
     search: '',
@@ -89,11 +93,27 @@ export function CollectionView({ collection }: { collection: string }) {
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const collectionRef = useRef(collection);
+  collectionRef.current = collection;
 
   const reload = useCallback(async () => {
+    const target = collection;
     setLoading(true);
     setError('');
     try {
+      const meRes = await fetch('/api/me');
+      if (meRes.ok) {
+        const me = (await meRes.json()) as {
+          userId?: string;
+          workspaceId?: string;
+        };
+        const scope = me.userId ?? me.workspaceId ?? 'anon';
+        if (collectionRef.current === target) {
+          setViewScope(scope);
+          setView(loadView(scope, target));
+        }
+      }
+
       const schemaRes = await fetch('/api/schema');
       const schemaBody = (await schemaRes.json()) as {
         collections?: Array<{ name: string; fields: FieldMeta[] }>;
@@ -102,9 +122,10 @@ export function CollectionView({ collection }: { collection: string }) {
       if (!schemaRes.ok) {
         throw new Error(schemaBody.error ?? 'Failed to load schema');
       }
-      const meta = schemaBody.collections?.find((c) => c.name === collection);
+      if (collectionRef.current !== target) return;
+      const meta = schemaBody.collections?.find((c) => c.name === target);
       if (!meta) {
-        throw new Error(`Collection not found: ${collection}`);
+        throw new Error(`Collection not found: ${target}`);
       }
       setFields(meta.fields);
 
@@ -113,7 +134,7 @@ export function CollectionView({ collection }: { collection: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          collection,
+          collection: target,
           fields: fieldNames,
           limit: 100,
         }),
@@ -125,18 +146,23 @@ export function CollectionView({ collection }: { collection: string }) {
       if (!queryRes.ok) {
         throw new Error(queryBody.error ?? 'Query failed');
       }
+      if (collectionRef.current !== target) return;
       setRows(queryBody.rows ?? []);
     } catch (err) {
+      if (collectionRef.current !== target) return;
       setError(err instanceof Error ? err.message : String(err));
     } finally {
-      setLoading(false);
+      if (collectionRef.current === target) setLoading(false);
     }
   }, [collection]);
 
   useEffect(() => {
-    setView(loadView(collection));
+    setSelected(null);
+    setCreating(false);
+    setRows([]);
+    setFields([]);
     void reload();
-  }, [collection, reload]);
+  }, [reload]);
 
   const visibleFields = useMemo(
     () => fields.filter((f) => !view.hiddenColumns.includes(f.name)),
@@ -155,7 +181,7 @@ export function CollectionView({ collection }: { collection: string }) {
 
   function updateView(next: ViewState) {
     setView(next);
-    saveView(collection, next);
+    saveView(viewScope, collection, next);
   }
 
   function openRow(row: Record<string, JsonValue>) {
@@ -187,7 +213,15 @@ export function CollectionView({ collection }: { collection: string }) {
         if (!field.writable) continue;
         const raw = draft[field.name] ?? '';
         if (field.type === 'number') {
-          payload[field.name] = raw === '' ? null : Number(raw);
+          if (raw === '') {
+            payload[field.name] = null;
+          } else {
+            const n = Number(raw);
+            if (!Number.isFinite(n)) {
+              throw new Error(`Invalid number for ${field.name}`);
+            }
+            payload[field.name] = n;
+          }
         } else if (field.type === 'boolean') {
           payload[field.name] = raw === 'true';
         } else {

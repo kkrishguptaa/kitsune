@@ -1,11 +1,15 @@
 import type { ChangeOpInput, JsonValue } from '@kitsuneos/core';
+import { KitsuneError } from '@kitsuneos/core';
 import { handleRestRecordGet, httpAuthError } from '@kitsuneos/graphql';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
+import { jsonError } from '@/lib/http-error';
 import { resolveRequestAuth } from '@/lib/request-auth';
 import { requireWorkspace } from '@/lib/require-workspace';
 
 const NOT_FOUND = { error: 'Not found' } as const;
+
+const WRITE_CAPABILITIES = new Set(['write', 'admin']);
 
 export async function GET(
   request: Request,
@@ -29,7 +33,8 @@ export async function GET(
 }
 
 /**
- * Update fields via propose → approve → apply (console human edit path).
+ * Update fields via propose → approve → apply.
+ * Auto-approve is limited to write/admin principals (not propose-only).
  */
 export async function PATCH(
   request: Request,
@@ -45,6 +50,18 @@ export async function PATCH(
       return NextResponse.json(
         { error: 'fields are required' },
         { status: 400 },
+      );
+    }
+
+    const schema = await engine.describeSchema(
+      ctx.workspaceId,
+      ctx.principalId,
+    );
+    const meta = schema.collections.find((c) => c.name === collection);
+    if (!meta || !WRITE_CAPABILITIES.has(meta.capability)) {
+      throw new KitsuneError(
+        'Write capability required to edit records in the console; propose-only principals use Inbox',
+        'forbidden',
       );
     }
 
@@ -89,8 +106,6 @@ export async function PATCH(
       applied,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    const status = message.includes('Unauthorized') ? 401 : 400;
-    return NextResponse.json({ error: message }, { status });
+    return jsonError(error);
   }
 }

@@ -30,6 +30,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
 
@@ -62,9 +64,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'kitsuneos' }}
         run: |
-          npx --yes wrangler@4 pages project create "$CLOUDFLARE_PAGES_PROJECT" \
+          # Pin matches scripts/deploy-site.sh (wrangler@4 major).
+          npx --yes wrangler@4.45.3 pages project create "$CLOUDFLARE_PAGES_PROJECT" \
             --production-branch=main 2>/dev/null || true
-          npx --yes wrangler@4 pages deploy apps/site/out \
+          npx --yes wrangler@4.45.3 pages deploy apps/site/out \
             --project-name="$CLOUDFLARE_PAGES_PROJECT" \
             --branch=main \
             --commit-hash="$GITHUB_SHA" \
@@ -77,6 +80,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
 
@@ -100,6 +105,7 @@ jobs:
       - name: Require deploy secrets
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: |
@@ -107,7 +113,7 @@ jobs:
             echo "::error::Set repository secret PULUMI_ACCESS_TOKEN (Pulumi Cloud)"
             exit 1
           fi
-          if [ -z "$AWS_ACCESS_KEY_ID" ] && [ -z "$AWS_ROLE_ARN" ]; then
+          if [ -z "$AWS_ROLE_ARN" ] && { [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; }; then
             echo "::error::Set AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY, or AWS_ROLE_ARN for OIDC"
             exit 1
           fi
@@ -116,11 +122,16 @@ jobs:
         id: aws_auth
         env:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           if [ -n "$AWS_ROLE_ARN" ]; then
             echo "mode=oidc" >> "$GITHUB_OUTPUT"
-          else
+          elif [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
             echo "mode=keys" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Incomplete AWS credentials"
+            exit 1
           fi
 
       - name: Configure AWS (OIDC)

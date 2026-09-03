@@ -1,6 +1,7 @@
 import type { FieldDefinition, SchemaChangeOp } from '@kitsuneos/core';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
+import { jsonError } from '@/lib/http-error';
 import { requireWorkspace } from '@/lib/require-workspace';
 
 export async function POST(request: Request) {
@@ -35,20 +36,48 @@ export async function POST(request: Request) {
       input,
     );
 
+    const stale = preview.incompatibleChangeSetIds;
+    if (stale.length > 0) {
+      const confirmed = body.confirmStaleIds;
+      if (!confirmed) {
+        return NextResponse.json(
+          {
+            preview,
+            requiresConfirmation: true,
+            error:
+              'Schema change would stale open change sets; pass confirmStaleIds to proceed',
+          },
+          { status: 409 },
+        );
+      }
+      const confirmedSet = new Set(confirmed);
+      if (
+        stale.length !== confirmed.length ||
+        stale.some((id) => !confirmedSet.has(id))
+      ) {
+        return NextResponse.json(
+          {
+            preview,
+            requiresConfirmation: true,
+            error:
+              'confirmStaleIds must exactly match incompatibleChangeSetIds',
+          },
+          { status: 409 },
+        );
+      }
+    }
+
     const result = await engine.applySchemaChange(
       ctx.workspaceId,
       ctx.principalId,
       {
         ...input,
-        confirmStaleIds:
-          body.confirmStaleIds ?? preview.incompatibleChangeSetIds,
+        confirmStaleIds: body.confirmStaleIds ?? [],
       },
     );
 
     return NextResponse.json({ ...result, preview });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    const status = message.includes('Unauthorized') ? 401 : 400;
-    return NextResponse.json({ error: message }, { status });
+    return jsonError(error);
   }
 }
