@@ -2,6 +2,16 @@
 
 Production app runs on AWS App Runner with RDS Postgres. See [`infra/README.md`](../../infra/README.md).
 
+## Local Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Opens the console at [http://localhost:8080](http://localhost:8080) with Postgres on host port `5433`.
+
+Local demo mode (`KITSUNE_LOCAL_DEMO=1`) skips WorkOS login and seeds a starter CRM workspace. Set real `WORKOS_*` values and clear `KITSUNE_LOCAL_DEMO` for AuthKit.
+
 ## WorkOS (AuthKit)
 
 | Variable | Description |
