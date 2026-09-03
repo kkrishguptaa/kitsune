@@ -9,7 +9,10 @@ services:
       - kitsune_pgdata:/var/lib/postgresql/data
       - ./scripts/db-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     ports:
+      # Postgres for host tools / CLI
       - "5433:5432"
+      # App shares this network namespace (see app.network_mode)
+      - "8080:8080"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d kitsune"]
       interval: 3s
@@ -20,19 +23,18 @@ services:
     build:
       context: .
       dockerfile: apps/app/Dockerfile
-    ports:
-      - "8080:8080"
+    # Share the db container network so the app can reach Postgres on
+    # 127.0.0.1 even when Docker bridge inter-container routing is broken.
+    network_mode: "service:db"
     environment:
       NODE_ENV: production
       PORT: "8080"
-      KITSUNE_OWNER_URL: postgresql://kitsune_owner:kitsune_owner@db:5432/kitsune
-      KITSUNE_APP_URL: postgresql://kitsune_app:kitsune_app@db:5432/kitsune
+      KITSUNE_OWNER_URL: postgresql://kitsune_owner:kitsune_owner@127.0.0.1:5432/kitsune
+      KITSUNE_APP_URL: postgresql://kitsune_app:kitsune_app@127.0.0.1:5432/kitsune
       KITSUNE_ALLOW_TEST_USER_HEADER: "1"
       KITSUNE_LOCAL_DEMO: "1"
       KITSUNE_DEMO_WORKOS_ID: local-demo-user
       KITSUNE_DEMO_EMAIL: demo@localhost
-      # WorkOS vars are optional in local-demo mode; pass through if present
-      # so /callback still works when you switch to real AuthKit later.
       WORKOS_API_KEY: ${WORKOS_API_KEY:-sk_test_local_demo_not_used}
       WORKOS_CLIENT_ID: ${WORKOS_CLIENT_ID:-client_local_demo_not_used}
       WORKOS_COOKIE_PASSWORD: ${WORKOS_COOKIE_PASSWORD:-local-demo-cookie-password-32chars!!}

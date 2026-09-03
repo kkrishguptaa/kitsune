@@ -33,13 +33,13 @@ RUN pnpm --filter @kitsuneos/core build \
  && pnpm --filter @kitsuneos/server build \
  && pnpm --filter @kitsuneos/provisioning build \
  && pnpm --filter @kitsuneos/ui build \
- && pnpm --filter @kitsuneos/app build \
- && mkdir -p /runtime/node_modules \
- && for dep in pg uuid pg-protocol pgpass pg-int8 pg-types postgres-array postgres-bytea postgres-date postgres-interval split2 xtend; do \
-      src="$(find /app/node_modules -type d -path "*/node_modules/${dep}" ! -path "*/.bin/*" | head -n1)"; \
-      if [ -z "$src" ]; then echo "missing runtime dep: ${dep}" >&2; exit 1; fi; \
-      mkdir -p "/runtime/node_modules/${dep}" && cp -aL "$src/." "/runtime/node_modules/${dep}/"; \
-    done
+ && pnpm --filter @kitsuneos/app build
+
+# Flatten entrypoint runtime deps (pg/uuid + transitive) outside the pnpm store.
+FROM base AS runtime-deps
+WORKDIR /runtime
+RUN npm init -y >/dev/null \
+ && npm install --omit=dev pg@8.16.0 uuid@11.1.0
 
 FROM base AS runner
 ENV NODE_ENV=production
@@ -56,7 +56,7 @@ COPY --from=builder /app/packages/core/package.json ./packages/core/package.json
 COPY --from=builder /app/packages/core/dist ./packages/core/dist
 COPY --from=builder /app/packages/provisioning/package.json ./packages/provisioning/package.json
 COPY --from=builder /app/packages/provisioning/dist ./packages/provisioning/dist
-COPY --from=builder /runtime/node_modules ./node_modules
+COPY --from=runtime-deps /runtime/node_modules ./node_modules
 USER root
 RUN mkdir -p node_modules/@kitsuneos \
   && ln -s ../../packages/core node_modules/@kitsuneos/core \
