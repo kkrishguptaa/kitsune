@@ -1,9 +1,16 @@
 import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
-import { type NextFetchEvent, type NextRequest, NextResponse } from 'next/server';
+import {
+  type NextFetchEvent,
+  type NextRequest,
+  NextResponse,
+} from 'next/server';
 
 const authkit = authkitMiddleware();
 
-export default function middleware(request: NextRequest, event: NextFetchEvent) {
+export default function middleware(
+  request: NextRequest,
+  event: NextFetchEvent,
+) {
   if (process.env.KITSUNE_LOCAL_DEMO === '1') {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(

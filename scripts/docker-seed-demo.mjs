@@ -3,7 +3,7 @@
  * Seeds a local-demo workspace/user when KITSUNE_LOCAL_DEMO=1.
  * Safe to re-run: provisionUserWorkspace is idempotent per workos id.
  */
-import { KitsuneEngine, DEFAULT_CONFIG } from '../packages/core/dist/index.js';
+import { DEFAULT_CONFIG, KitsuneEngine } from '../packages/core/dist/index.js';
 import { provisionUserWorkspace } from '../packages/provisioning/dist/index.js';
 
 export async function seedLocalDemo() {
