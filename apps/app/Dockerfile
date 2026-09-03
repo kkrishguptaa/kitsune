@@ -33,7 +33,13 @@ RUN pnpm --filter @kitsuneos/core build \
  && pnpm --filter @kitsuneos/server build \
  && pnpm --filter @kitsuneos/provisioning build \
  && pnpm --filter @kitsuneos/ui build \
- && pnpm --filter @kitsuneos/app build
+ && pnpm --filter @kitsuneos/app build \
+ && mkdir -p /runtime/node_modules \
+ && for dep in pg uuid pg-protocol pgpass pg-int8 pg-types postgres-array postgres-bytea postgres-date postgres-interval split2 xtend; do \
+      src="$(find /app/node_modules -type d -path "*/node_modules/${dep}" ! -path "*/.bin/*" | head -n1)"; \
+      if [ -z "$src" ]; then echo "missing runtime dep: ${dep}" >&2; exit 1; fi; \
+      mkdir -p "/runtime/node_modules/${dep}" && cp -aL "$src/." "/runtime/node_modules/${dep}/"; \
+    done
 
 FROM base AS runner
 ENV NODE_ENV=production
@@ -50,23 +56,12 @@ COPY --from=builder /app/packages/core/package.json ./packages/core/package.json
 COPY --from=builder /app/packages/core/dist ./packages/core/dist
 COPY --from=builder /app/packages/provisioning/package.json ./packages/provisioning/package.json
 COPY --from=builder /app/packages/provisioning/dist ./packages/provisioning/dist
-COPY --from=builder /app/node_modules/pg ./node_modules/pg
-COPY --from=builder /app/node_modules/pg-protocol ./node_modules/pg-protocol
-COPY --from=builder /app/node_modules/pgpass ./node_modules/pgpass
-COPY --from=builder /app/node_modules/pg-int8 ./node_modules/pg-int8
-COPY --from=builder /app/node_modules/pg-types ./node_modules/pg-types
-COPY --from=builder /app/node_modules/postgres-array ./node_modules/postgres-array
-COPY --from=builder /app/node_modules/postgres-bytea ./node_modules/postgres-bytea
-COPY --from=builder /app/node_modules/postgres-date ./node_modules/postgres-date
-COPY --from=builder /app/node_modules/postgres-interval ./node_modules/postgres-interval
-COPY --from=builder /app/node_modules/split2 ./node_modules/split2
-COPY --from=builder /app/node_modules/xtend ./node_modules/xtend
-COPY --from=builder /app/node_modules/uuid ./node_modules/uuid
+COPY --from=builder /runtime/node_modules ./node_modules
 USER root
 RUN mkdir -p node_modules/@kitsuneos \
   && ln -s ../../packages/core node_modules/@kitsuneos/core \
   && ln -s ../../packages/provisioning node_modules/@kitsuneos/provisioning \
-  && chown -R nextjs:nodejs scripts packages node_modules
+  && chown -R nextjs:nodejs scripts packages node_modules apps
 USER nextjs
 EXPOSE 8080
 CMD ["node", "scripts/docker-entrypoint.mjs"]
