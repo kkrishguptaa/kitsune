@@ -20,6 +20,7 @@ async function requireAdmin(ctx: WorkspaceContext): Promise<void> {
 export async function GET() {
   try {
     const ctx = await requireWorkspace();
+    await requireAdmin(ctx);
     const grants = await engine.listGrants(ctx.workspaceId, ctx.principalId);
     const principals = await engine.ownerPool.query<{
       id: string;
@@ -45,7 +46,11 @@ export async function GET() {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const status = message.includes('Unauthorized') ? 401 : 400;
+    const status = message.includes('Unauthorized')
+      ? 401
+      : message.includes('Not found')
+        ? 404
+        : 400;
     return NextResponse.json({ error: message }, { status });
   }
 }
