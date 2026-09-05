@@ -21,10 +21,10 @@ import {
 } from './automation/policies.js';
 import { assertWriteEntitlement } from './billing/entitlement.js';
 import {
+  type BranchFieldMeta,
   copyRelationTable,
   orderCollectionsForBranch,
   sanitizeBranchName,
-  type BranchFieldMeta,
 } from './branching/copy.js';
 import { compilePredicate } from './compiler/predicate-sql.js';
 import {

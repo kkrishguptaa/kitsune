@@ -33,10 +33,7 @@ export function orderCollectionsForBranch(
       if (!byName.has(field.relationTargetName)) continue;
       // edge: target -> dependent
       edges.get(field.relationTargetName)?.push(collection.name);
-      indegree.set(
-        collection.name,
-        (indegree.get(collection.name) ?? 0) + 1,
-      );
+      indegree.set(collection.name, (indegree.get(collection.name) ?? 0) + 1);
     }
   }
 
