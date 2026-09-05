@@ -1,6 +1,6 @@
 # KitsuneOS v1 — Product Requirements Document
 
-**Status:** P0 implemented against acceptance tests (2026-09-02). Human console IA shipped (2026-09-03). P1 unbuilt.
+**Status:** P0 implemented against acceptance tests (2026-09-02). Human console IA shipped (2026-09-03). P1 (R9–R13) implemented.
 **Date:** 3 September 2026
 **Supersedes:** agent-primary draft (2 September 2026)
 **Positioning:** The application database humans and agents share.
@@ -189,7 +189,7 @@ A grant binds a principal (human or agent identity) to a collection, a capabilit
 
 Additional criteria:
 - [x] Row predicates are enforced in the database, not the application layer
-- [x] Field masks apply to reads, writes, and aggregates (search is P1 and unbuilt)
+- [x] Field masks apply to reads, writes, and aggregates (search is P1 and implemented via pgvector)
 - [x] Absence of a matching grant denies
 - [x] Revoking a grant makes affected open change sets unmergeable
 
