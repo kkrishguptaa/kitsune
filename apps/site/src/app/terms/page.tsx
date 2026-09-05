@@ -16,10 +16,10 @@ export default function TermsPage() {
 
       <h2>Early access</h2>
       <p>
-        KitsuneOS is in early access. The product may change as we learn.
-        We do not guarantee uptime or data retention during this period. The
-        hosted service is intended for evaluation and non-production work until
-        we announce general availability.
+        KitsuneOS is in early access. The product may change as we learn. We do
+        not guarantee uptime or data retention during this period. The hosted
+        service is intended for evaluation and non-production work until we
+        announce general availability.
       </p>
 
       <h2>How Ciel uses KitsuneOS</h2>

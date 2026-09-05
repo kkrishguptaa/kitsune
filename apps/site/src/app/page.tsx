@@ -47,8 +47,8 @@ export default function LandingPage() {
       <section className="band" id="scatter">
         <h2>Knowing used to live everywhere.</h2>
         <p>
-          In chats. In docs no one opens. In someone’s head on a Tuesday.
-          Help arrived fast — but the memory of what you decided didn’t.
+          In chats. In docs no one opens. In someone’s head on a Tuesday. Help
+          arrived fast — but the memory of what you decided didn’t.
         </p>
       </section>
 

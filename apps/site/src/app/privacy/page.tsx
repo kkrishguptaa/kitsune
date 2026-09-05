@@ -18,7 +18,9 @@ export default function PrivacyPage() {
       <ul>
         <li>Account identity via WorkOS (email, WorkOS user id)</li>
         <li>Workspace content you create and keep in KitsuneOS</li>
-        <li>Secret hashes for access credentials (never shown again in full)</li>
+        <li>
+          Secret hashes for access credentials (never shown again in full)
+        </li>
         <li>
           Billing status when you subscribe via Dodo Payments (subscription id,
           status, and plan details — not full card numbers)

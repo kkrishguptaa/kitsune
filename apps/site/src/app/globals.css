@@ -54,8 +54,16 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(56rem 40rem at 82% -8%, var(--k-orange-glow), transparent 58%),
-    radial-gradient(36rem 28rem at 8% 110%, rgba(245, 78, 0, 0.08), transparent 55%),
+    radial-gradient(
+      56rem 40rem at 82% -8%,
+      var(--k-orange-glow),
+      transparent 58%
+    ),
+    radial-gradient(
+      36rem 28rem at 8% 110%,
+      rgba(245, 78, 0, 0.08),
+      transparent 55%
+    ),
     linear-gradient(165deg, #090909 0%, var(--k-bg) 42%, #0a0a0a 100%);
 }
 
@@ -460,8 +468,8 @@ button:focus-visible {
   }
 
   .hero-media {
-    background: #050505 url("/kitsune-agents-ad-poster.jpg") center / cover
-      no-repeat;
+    background:
+      #050505 url("/kitsune-agents-ad-poster.jpg") center / cover no-repeat;
     min-height: 12rem;
   }
 }
