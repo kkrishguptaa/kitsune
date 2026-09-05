@@ -179,7 +179,11 @@ export function createMcpHandlers(
       externalSubject: string;
     }) {
       const ctx = getContext();
-      await engine.linkPrincipalIdentity(ctx.workspaceId, ctx.principalId, args);
+      await engine.linkPrincipalIdentity(
+        ctx.workspaceId,
+        ctx.principalId,
+        args,
+      );
       return { ok: true };
     },
 

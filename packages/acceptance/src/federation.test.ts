@@ -1,10 +1,6 @@
 import type { KitsuneEngine } from '@kitsuneos/core';
 import { beforeAll, describe, expect, it } from 'vitest';
-import {
-  createStandardFixture,
-  type Fixture,
-  getEngine,
-} from './fixtures.js';
+import { createStandardFixture, type Fixture, getEngine } from './fixtures.js';
 
 describe('R16 cross-workspace principal identity', () => {
   let engine: KitsuneEngine;
@@ -16,15 +12,11 @@ describe('R16 cross-workspace principal identity', () => {
   });
 
   it('links and resolves the same subject across workspaces', async () => {
-    await engine.linkPrincipalIdentity(
-      fixture.workspaceId,
-      fixture.adminId,
-      {
-        principalId: fixture.adminId,
-        externalIssuer: 'workos',
-        externalSubject: 'user_federation_admin_1',
-      },
-    );
+    await engine.linkPrincipalIdentity(fixture.workspaceId, fixture.adminId, {
+      principalId: fixture.adminId,
+      externalIssuer: 'workos',
+      externalSubject: 'user_federation_admin_1',
+    });
 
     const other = await createStandardFixture(engine);
     await engine.linkPrincipalIdentity(other.workspaceId, other.adminId, {
@@ -48,22 +40,19 @@ describe('R16 cross-workspace principal identity', () => {
     expect(
       hits.some(
         (h) =>
-          h.workspaceId === other.workspaceId && h.principalId === other.adminId,
+          h.workspaceId === other.workspaceId &&
+          h.principalId === other.adminId,
       ),
     ).toBe(true);
   });
 
   it('copies external identity onto branch principals', async () => {
     const subject = `user_branch_${fixture.workspaceId.slice(0, 8)}`;
-    await engine.linkPrincipalIdentity(
-      fixture.workspaceId,
-      fixture.adminId,
-      {
-        principalId: fixture.adminId,
-        externalIssuer: 'workos',
-        externalSubject: subject,
-      },
-    );
+    await engine.linkPrincipalIdentity(fixture.workspaceId, fixture.adminId, {
+      principalId: fixture.adminId,
+      externalIssuer: 'workos',
+      externalSubject: subject,
+    });
 
     const branch = await engine.createBranch(
       fixture.workspaceId,
@@ -75,23 +64,17 @@ describe('R16 cross-workspace principal identity', () => {
       'workos',
       subject,
     );
-    expect(
-      hits.some((h) => h.workspaceId === fixture.workspaceId),
-    ).toBe(true);
+    expect(hits.some((h) => h.workspaceId === fixture.workspaceId)).toBe(true);
     expect(hits.some((h) => h.workspaceId === branch.workspaceId)).toBe(true);
   });
 
   it('rejects duplicate identities in the same workspace and non-admins', async () => {
     const subject = `user_dup_${fixture.workspaceId.slice(0, 8)}`;
-    await engine.linkPrincipalIdentity(
-      fixture.workspaceId,
-      fixture.adminId,
-      {
-        principalId: fixture.adminId,
-        externalIssuer: 'workos',
-        externalSubject: subject,
-      },
-    );
+    await engine.linkPrincipalIdentity(fixture.workspaceId, fixture.adminId, {
+      principalId: fixture.adminId,
+      externalIssuer: 'workos',
+      externalSubject: subject,
+    });
 
     await expect(
       engine.linkPrincipalIdentity(fixture.workspaceId, fixture.adminId, {

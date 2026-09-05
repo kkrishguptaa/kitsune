@@ -51,11 +51,16 @@ describe('MCP principal identity tools (R16)', () => {
 
   it('lets admins link and resolve principal identities via MCP', async () => {
     const subject = `mcp_fed_${fixture.workspaceId.slice(0, 8)}`;
-    const linked = await callTool(baseUrl, adminKey, 'link_principal_identity', {
-      principalId: fixture.adminId,
-      externalIssuer: 'workos',
-      externalSubject: subject,
-    });
+    const linked = await callTool(
+      baseUrl,
+      adminKey,
+      'link_principal_identity',
+      {
+        principalId: fixture.adminId,
+        externalIssuer: 'workos',
+        externalSubject: subject,
+      },
+    );
     expect(linked.status).toBe(200);
 
     const resolved = await callTool(

@@ -19,8 +19,7 @@ if (!configuredRedirectUri && process.env.KITSUNE_LOCAL_DEMO !== '1') {
   );
 }
 
-const redirectUri =
-  configuredRedirectUri ?? 'http://localhost:3000/callback';
+const redirectUri = configuredRedirectUri ?? 'http://localhost:3000/callback';
 
 const authkit = authkitMiddleware({
   redirectUri,

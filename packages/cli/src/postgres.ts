@@ -149,17 +149,15 @@ function rolesAndDatabaseReady(): boolean {
   );
 }
 
-
 export function ensureVectorExtension(): void {
   // pgvector is required for embeddings (ADR-004). Prefer a pgvector image
   // (pgvector/pgvector:pg16) or install the extension package on the host.
   const sql = 'CREATE EXTENSION IF NOT EXISTS vector;';
   try {
-    execFileSync(
-      'psql',
-      [OWNER_URL, '-v', 'ON_ERROR_STOP=1', '-c', sql],
-      { stdio: ['ignore', 'ignore', 'pipe'], env: process.env },
-    );
+    execFileSync('psql', [OWNER_URL, '-v', 'ON_ERROR_STOP=1', '-c', sql], {
+      stdio: ['ignore', 'ignore', 'pipe'],
+      env: process.env,
+    });
   } catch (error) {
     const detail =
       error instanceof Error && 'stderr' in error
