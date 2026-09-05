@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 
 const TABS = [
   { href: '/settings/schema', label: 'Databases' },
+  { href: '/settings/people', label: 'People' },
+  { href: '/settings/teams', label: 'Teams' },
   { href: '/settings/access', label: 'Access' },
   { href: '/settings/connect', label: 'Connect AI' },
   { href: '/settings/workspace', label: 'Account' },
