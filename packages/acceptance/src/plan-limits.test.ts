@@ -13,7 +13,7 @@ describe('free plan limits', () => {
 
   beforeAll(async () => {
     engine = await getEngine();
-    const fixture = await createStandardFixture(engine);
+    const fixture = await createStandardFixture(engine, { plan: 'free' });
     workspaceId = fixture.workspaceId;
   });
 

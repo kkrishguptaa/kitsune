@@ -1018,6 +1018,11 @@ export class KitsuneEngine {
         detail: { collection: request.collection },
       });
       await client.query('COMMIT');
+      // Aggregate result rows have no record id; page_access post-filtering
+      // only applies to row-level queries.
+      if (request.aggregates?.length) {
+        return rows;
+      }
       const ids = rows
         .map((row) => row.id)
         .filter((id): id is string => typeof id === 'string');
