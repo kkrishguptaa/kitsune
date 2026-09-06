@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Database, Settings, Table2 } from 'lucide-react';
+import { Bell, Settings, Table2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -69,11 +69,11 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-3 py-4">
         <Link href="/" className="flex items-center gap-2 px-1">
-          <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Database className="size-4" />
+          <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold tracking-tight">
+            K
           </div>
           <span className="text-sm font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
-            KitsuneOS
+            Kitsune<span className="text-primary">OS</span>
           </span>
         </Link>
       </SidebarHeader>
