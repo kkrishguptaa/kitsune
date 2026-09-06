@@ -27,15 +27,15 @@
 | 1 | Compile page ACL into query path (DNA) | Post-filter solid; compiler TODO remains |
 | 2 | Personal `notes` + default-private create | **Shipped** |
 | 3 | Global capture + search palette (⌘K) | **Shipped** |
-| 4 | Wiki-links, backlinks, graph edges from prose | In progress |
-| 5 | Editor slash/block parity | In progress |
-| 6 | CMS publish lifecycle (`draft`/`published`) | Pending |
-| 7 | Media library UI on pages | Pending |
-| 8 | Webhooks settings console | Pending |
+| 4 | Wiki-links, backlinks, graph edges from prose | **Shipped** |
+| 5 | Editor slash/block parity | **Shipped** (slash menu MVP) |
+| 6 | CMS publish lifecycle (`draft`/`published`) | **Shipped** |
+| 7 | Media library UI on pages | **Shipped** |
+| 8 | Webhooks settings console | **Shipped** |
 | 9 | Markdown vault import/export in Connect | Pending |
 | 10 | Remote MCP Streamable HTTP honesty | Partial (prior work) |
 | 11 | OAuth authorization-code UI | Deferred (client_credentials MVP exists) |
-| 12 | Backlinks chrome on page | With #4 |
+| 12 | Backlinks chrome on page | **Shipped** |
 
 ---
 
