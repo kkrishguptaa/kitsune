@@ -5,12 +5,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const TABS = [
-  { href: '/settings/schema', label: 'Databases' },
+  { href: '/settings/workspace', label: 'Account' },
   { href: '/settings/people', label: 'People' },
   { href: '/settings/teams', label: 'Teams' },
   { href: '/settings/access', label: 'Access' },
   { href: '/settings/connect', label: 'Connect AI' },
-  { href: '/settings/workspace', label: 'Account' },
 ];
 
 export function SettingsNav() {
@@ -19,7 +18,7 @@ export function SettingsNav() {
     <div className="border-b border-border px-6 pt-4">
       <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Manage your databases, who can change what, and how AI helpers connect.
+        Workspace account, people, access, and AI connections.
       </p>
       <nav className="mt-3 flex flex-wrap gap-4">
         {TABS.map((tab) => (
