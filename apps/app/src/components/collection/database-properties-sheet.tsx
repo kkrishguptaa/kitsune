@@ -253,14 +253,16 @@ export function DatabasePropertiesSheet({
               <Label htmlFor="property-name">Name</Label>
               <Input
                 id="property-name"
+                name="propertyName"
                 value={newName}
                 onChange={(event) => setNewName(event.target.value)}
-                placeholder="status"
+                placeholder="e.g. status…"
                 autoComplete="off"
+                spellCheck={false}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Type</Label>
+              <Label htmlFor="property-type">Type</Label>
               <Select
                 value={newType}
                 onValueChange={(value) => {
@@ -268,7 +270,7 @@ export function DatabasePropertiesSheet({
                   if (value !== 'relation') setNewRelationTarget('');
                 }}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="property-type" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,21 +291,23 @@ export function DatabasePropertiesSheet({
                 <Label htmlFor="property-choices">Choices</Label>
                 <Input
                   id="property-choices"
+                  name="propertyChoices"
                   value={newEnumValues}
                   onChange={(event) => setNewEnumValues(event.target.value)}
-                  placeholder="open, won, lost"
+                  placeholder="e.g. open, won, lost…"
+                  autoComplete="off"
                 />
               </div>
             ) : null}
             {newType === 'relation' ? (
               <div className="space-y-1.5">
-                <Label>Related database</Label>
+                <Label htmlFor="property-relation">Related database</Label>
                 <Select
                   value={newRelationTarget}
                   onValueChange={setNewRelationTarget}
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select database" />
+                  <SelectTrigger id="property-relation" className="w-full">
+                    <SelectValue placeholder="Select database…" />
                   </SelectTrigger>
                   <SelectContent>
                     {databases.map((database) => (

@@ -104,11 +104,12 @@ export function CreateDatabaseDialog({
             <Label htmlFor="create-database-name">Name</Label>
             <Input
               id="create-database-name"
+              name="databaseName"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="accounts"
+              placeholder="e.g. accounts…"
               autoComplete="off"
-              autoFocus
+              spellCheck={false}
             />
           </div>
           <DialogFooter>
