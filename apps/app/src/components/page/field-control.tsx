@@ -1,6 +1,7 @@
 'use client';
 
 import type { JsonValue } from '@kitsuneos/core';
+import { ProseEditor } from '@/components/page/prose-editor';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -45,12 +46,10 @@ export function FieldControl({
 
   if (field.type === 'prose') {
     return (
-      <Textarea
-        id={id}
+      <ProseEditor
         value={value}
         disabled={!field.writable}
-        rows={rows}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={onChange}
       />
     );
   }

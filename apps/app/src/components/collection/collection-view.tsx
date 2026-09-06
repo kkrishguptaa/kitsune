@@ -41,6 +41,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { pageHref } from '@/lib/page';
+import {
+  isPublishableCollection,
+  normalizePublishStatus,
+  PUBLISH_STATUSES,
+  type PublishStatus,
+  pickStatusField,
+  publishStatusLabel,
+} from '@/lib/publish-status';
 import { recordLabel } from '@/lib/record-label';
 
 interface SchemaCollection {
@@ -157,6 +165,9 @@ export function CollectionView({ collection }: { collection: string }) {
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<PublishStatus | 'all'>(
+    'all',
+  );
   const collectionRef = useRef(collection);
   collectionRef.current = collection;
 
@@ -231,10 +242,13 @@ export function CollectionView({ collection }: { collection: string }) {
     setRows([]);
     setFields([]);
     setRelationOptions({});
+    setStatusFilter('all');
     void reload();
   }, [reload]);
 
   const canDirectEdit = fields.some((field) => field.writable);
+  const statusField = useMemo(() => pickStatusField(fields), [fields]);
+  const publishable = useMemo(() => isPublishableCollection(fields), [fields]);
 
   const visibleFields = useMemo(
     () => fields.filter((f) => !view.hiddenColumns.includes(f.name)),
@@ -242,9 +256,17 @@ export function CollectionView({ collection }: { collection: string }) {
   );
 
   const filteredRows = useMemo(() => {
+    let next = rows;
+    if (publishable && statusField && statusFilter !== 'all') {
+      next = next.filter(
+        (row) =>
+          normalizePublishStatus(cellText(row[statusField.name])) ===
+          statusFilter,
+      );
+    }
     const q = view.search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((row) =>
+    if (!q) return next;
+    return next.filter((row) =>
       visibleFields.some((field) => {
         const raw = cellText(row[field.name]).toLowerCase();
         const label =
@@ -258,7 +280,15 @@ export function CollectionView({ collection }: { collection: string }) {
         return raw.includes(q) || label.includes(q);
       }),
     );
-  }, [rows, view.search, visibleFields, relationOptions]);
+  }, [
+    rows,
+    view.search,
+    visibleFields,
+    relationOptions,
+    publishable,
+    statusField,
+    statusFilter,
+  ]);
 
   function updateView(next: ViewState) {
     setView(next);
@@ -275,6 +305,9 @@ export function CollectionView({ collection }: { collection: string }) {
     const next: Record<string, string> = {};
     for (const field of fields) {
       next[field.name] = '';
+    }
+    if (statusField) {
+      next[statusField.name] = 'draft';
     }
     setDraft(next);
   }
@@ -377,6 +410,33 @@ export function CollectionView({ collection }: { collection: string }) {
         <p className="border-b border-border px-6 py-2 text-sm text-destructive">
           {error}
         </p>
+      ) : null}
+
+      {publishable ? (
+        <div className="flex flex-wrap gap-2 border-b border-border px-6 py-2">
+          {(
+            [
+              { id: 'all' as const, label: 'All' },
+              ...PUBLISH_STATUSES.map((status) => ({
+                id: status,
+                label: publishStatusLabel(status),
+              })),
+            ] as const
+          ).map((chip) => {
+            const active = statusFilter === chip.id;
+            return (
+              <Button
+                key={chip.id}
+                type="button"
+                size="sm"
+                variant={active ? 'default' : 'outline'}
+                onClick={() => setStatusFilter(chip.id)}
+              >
+                {chip.label}
+              </Button>
+            );
+          })}
+        </div>
       ) : null}
 
       {truncated ? (

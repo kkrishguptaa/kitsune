@@ -11,6 +11,8 @@ import {
   type FieldMeta,
   type RelationOption,
 } from '@/components/page/field-control';
+import { MediaLibrary } from '@/components/page/media-library';
+import { ShareDialog } from '@/components/page/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,6 +22,13 @@ import {
   type OpenChangeRequestRef,
 } from '@/lib/group-ops-by-page';
 import { pageHref, pickBodyField, pickTitleField } from '@/lib/page';
+import {
+  isPublishableCollection,
+  normalizePublishStatus,
+  type PublishStatus,
+  pickStatusField,
+  publishStatusLabel,
+} from '@/lib/publish-status';
 import { recordLabel } from '@/lib/record-label';
 
 interface SchemaCollection {
@@ -38,6 +47,18 @@ interface RelatedNeighbor {
 interface RelatedResult {
   outgoing: RelatedNeighbor[];
   incoming: RelatedNeighbor[];
+}
+
+interface BacklinkNeighbor {
+  collection: string;
+  recordId: string;
+  label: string | null;
+  rawTarget: string;
+}
+
+interface BacklinksResult {
+  outgoing: BacklinkNeighbor[];
+  incoming: BacklinkNeighbor[];
 }
 
 interface RevisionSummary {
@@ -115,11 +136,14 @@ export function PageView({
     Record<string, RelationOption[]>
   >({});
   const [related, setRelated] = useState<RelatedResult | null>(null);
+  const [backlinks, setBacklinks] = useState<BacklinksResult | null>(null);
   const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [relatedLoading, setRelatedLoading] = useState(false);
+  const [backlinksLoading, setBacklinksLoading] = useState(false);
   const [revisionsLoading, setRevisionsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState('');
   const [dirty, setDirty] = useState(false);
   const [pendingChangeRequests, setPendingChangeRequests] = useState<
@@ -128,16 +152,25 @@ export function PageView({
 
   const titleField = useMemo(() => pickTitleField(fields), [fields]);
   const bodyField = useMemo(() => pickBodyField(fields), [fields]);
+  const statusField = useMemo(() => pickStatusField(fields), [fields]);
+  const publishable = useMemo(() => isPublishableCollection(fields), [fields]);
   const propertyFields = useMemo(
     () =>
       fields.filter(
         (field) =>
           field.name !== 'id' &&
           field.name !== titleField?.name &&
-          field.name !== bodyField?.name,
+          field.name !== bodyField?.name &&
+          !(publishable && statusField && field.name === statusField.name),
       ),
-    [fields, titleField, bodyField],
+    [fields, titleField, bodyField, publishable, statusField],
   );
+  const currentStatus = useMemo(() => {
+    if (!statusField) return null;
+    return normalizePublishStatus(
+      draft[statusField.name] ?? cellText(row?.[statusField.name]),
+    );
+  }, [statusField, draft, row]);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -192,6 +225,7 @@ export function PageView({
   useEffect(() => {
     let cancelled = false;
     setRelatedLoading(true);
+    setBacklinksLoading(true);
     setRevisionsLoading(true);
     void fetch('/api/related', {
       method: 'POST',
@@ -218,6 +252,31 @@ export function PageView({
       })
       .finally(() => {
         if (!cancelled) setRelatedLoading(false);
+      });
+
+    void fetch(
+      `/api/backlinks?collection=${encodeURIComponent(collection)}&recordId=${encodeURIComponent(pageId)}`,
+    )
+      .then(async (response) => {
+        const body = (await response.json()) as BacklinksResult & {
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!response.ok) {
+          throw new Error(body.error ?? 'Failed to load backlinks');
+        }
+        setBacklinks({
+          outgoing: body.outgoing ?? [],
+          incoming: body.incoming ?? [],
+        });
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+        setBacklinks(null);
+      })
+      .finally(() => {
+        if (!cancelled) setBacklinksLoading(false);
       });
 
     void fetch('/api/history', {
@@ -295,6 +354,23 @@ export function PageView({
       const body = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(body.error ?? 'Update failed');
       await reload();
+      // Refresh wiki-link panel after prose save
+      try {
+        const blRes = await fetch(
+          `/api/backlinks?collection=${encodeURIComponent(collection)}&recordId=${encodeURIComponent(pageId)}`,
+        );
+        const blBody = (await blRes.json()) as BacklinksResult & {
+          error?: string;
+        };
+        if (blRes.ok) {
+          setBacklinks({
+            outgoing: blBody.outgoing ?? [],
+            incoming: blBody.incoming ?? [],
+          });
+        }
+      } catch {
+        // keep prior backlinks
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -302,7 +378,29 @@ export function PageView({
     }
   }
 
+  async function setPublishStatus(next: PublishStatus) {
+    if (!statusField) return;
+    setPublishing(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/records/${collection}/${pageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { [statusField.name]: next } }),
+      });
+      const body = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(body.error ?? 'Status update failed');
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPublishing(false);
+    }
+  }
+
   const canDirectEdit = fields.some((field) => field.writable);
+  const canPublish =
+    Boolean(statusField?.writable) && canDirectEdit && !publishing;
 
   if (loading) {
     return (
@@ -366,8 +464,55 @@ export function PageView({
             >
               {pageId.slice(0, 8)}…
             </Badge>
+            {publishable && currentStatus ? (
+              <Badge
+                variant={
+                  currentStatus === 'published'
+                    ? 'default'
+                    : currentStatus === 'archived'
+                      ? 'outline'
+                      : 'secondary'
+                }
+                className="mt-2 ml-2 w-fit text-[10px] uppercase"
+              >
+                {publishStatusLabel(currentStatus)}
+              </Badge>
+            ) : null}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {publishable && statusField ? (
+              <>
+                {currentStatus !== 'published' ? (
+                  <Button
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('published')}
+                  >
+                    Publish
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('draft')}
+                  >
+                    Unpublish
+                  </Button>
+                )}
+                {currentStatus !== 'archived' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('archived')}
+                  >
+                    Archive
+                  </Button>
+                ) : null}
+              </>
+            ) : null}
+            <ShareDialog collection={collection} recordId={pageId} />
             <Button
               variant="outline"
               size="sm"
@@ -524,6 +669,75 @@ export function PageView({
 
           <div className="space-y-2 border-t border-border pt-4">
             <p className="text-xs font-medium text-muted-foreground uppercase">
+              Links
+            </p>
+            {backlinksLoading ? (
+              <Skeleton className="h-12 w-full" />
+            ) : !backlinks ||
+              (backlinks.outgoing.length === 0 &&
+                backlinks.incoming.length === 0) ? (
+              <p className="text-xs text-muted-foreground">
+                No wiki-links yet. Use{' '}
+                <code className="font-mono text-[10px]">[[Title]]</code> in the
+                body.
+              </p>
+            ) : (
+              <div className="space-y-3 text-sm">
+                {backlinks.outgoing.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase text-muted-foreground">
+                      Outgoing
+                    </p>
+                    <ul className="space-y-1.5">
+                      {backlinks.outgoing.map((link, index) => (
+                        <li
+                          key={`wiki-out-${link.rawTarget}-${link.recordId || index}`}
+                        >
+                          {link.collection && link.recordId ? (
+                            <Link
+                              href={pageHref(link.recordId, link.collection)}
+                              className="text-primary underline-offset-4 hover:underline"
+                            >
+                              {link.label ?? link.rawTarget}
+                            </Link>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              [[{link.rawTarget}]] (unresolved)
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {backlinks.incoming.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase text-muted-foreground">
+                      Backlinks
+                    </p>
+                    <ul className="space-y-1.5">
+                      {backlinks.incoming.map((link) => (
+                        <li key={`wiki-in-${link.collection}-${link.recordId}`}>
+                          <Link
+                            href={pageHref(link.recordId, link.collection)}
+                            className="text-primary underline-offset-4 hover:underline"
+                          >
+                            {link.label ?? link.recordId.slice(0, 8)}
+                          </Link>
+                          <span className="ml-1 text-[10px] text-muted-foreground">
+                            via [[{link.rawTarget}]]
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2 border-t border-border pt-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase">
               History
             </p>
             {revisionsLoading ? (
@@ -572,6 +786,12 @@ export function PageView({
               This database has no prose body field.
             </p>
           )}
+          <MediaLibrary
+            collection={collection}
+            recordId={pageId}
+            fields={fields}
+            canUpload={canDirectEdit}
+          />
         </section>
       </div>
     </div>
