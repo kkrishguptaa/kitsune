@@ -252,24 +252,48 @@ export const TOOL_DEFINITIONS = [
     description:
       'List the collections and fields you are allowed to see, with your capability on each. Fields outside your grant are not listed at all. Call this first.',
     inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      title: 'describe schema',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'query',
     description:
       'Read records from a collection. Results are restricted to the rows and fields your grant allows; the record id is always included so you can propose changes against a result.',
     inputSchema: querySchema,
+    annotations: {
+      title: 'query',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'read_record',
     description:
       'Read one record by id. Returns null when the record does not exist or your grant excludes it, which are deliberately indistinguishable.',
     inputSchema: readRecordSchema,
+    annotations: {
+      title: 'read record',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'search',
     description:
       'Semantic search over prose fields. Grants (field masks and row predicates) are applied inside the query — masked fields never appear in excerpts, and denied collections are omitted entirely.',
     inputSchema: searchSchema,
+    annotations: {
+      title: 'search',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'memory_search',
@@ -311,18 +335,36 @@ export const TOOL_DEFINITIONS = [
     description:
       'List outgoing and incoming relation neighbors of a record that you are allowed to see. Invisible targets are omitted.',
     inputSchema: readRelatedSchema,
+    annotations: {
+      title: 'read related',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'ls',
     description:
       'List a virtual filesystem path over grant-visible collections and records. Directories are collections and record ids; files are field snapshots (.md for prose, .json otherwise). Read-only MCP/CLI projection — not a mounted FUSE filesystem. Writes still use propose_change_set.',
     inputSchema: vfsPathSchema,
+    annotations: {
+      title: 'ls',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'read',
     description:
       'Read one virtual file at /<collection>/<recordId>/<field>.md|.json. Only fields in your grant are readable. Does not write.',
     inputSchema: vfsPathSchema,
+    annotations: {
+      title: 'read',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'ingest',
@@ -351,6 +393,12 @@ export const TOOL_DEFINITIONS = [
           },
         },
       },
+    },
+    annotations: {
+      title: 'ingest',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
   {
@@ -382,6 +430,12 @@ export const TOOL_DEFINITIONS = [
         fileName: { type: 'string' },
       },
     },
+    annotations: {
+      title: 'put attachment',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'list_attachments',
@@ -399,6 +453,12 @@ export const TOOL_DEFINITIONS = [
         },
       },
     },
+    annotations: {
+      title: 'list attachments',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'get_attachment',
@@ -410,6 +470,12 @@ export const TOOL_DEFINITIONS = [
       properties: {
         attachmentId: { type: 'string' },
       },
+    },
+    annotations: {
+      title: 'get attachment',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
   {
@@ -431,6 +497,12 @@ export const TOOL_DEFINITIONS = [
         },
       },
     },
+    annotations: {
+      title: 'create webhook endpoint',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'list_webhook_endpoints',
@@ -439,6 +511,12 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object',
       properties: {},
+    },
+    annotations: {
+      title: 'list webhook endpoints',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
   {
@@ -452,6 +530,12 @@ export const TOOL_DEFINITIONS = [
         endpointId: { type: 'string' },
       },
     },
+    annotations: {
+      title: 'delete webhook endpoint',
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    },
   },
   {
     name: 'enqueue_merge',
@@ -463,6 +547,12 @@ export const TOOL_DEFINITIONS = [
       properties: {
         changeSetId: { type: 'string' },
       },
+    },
+    annotations: {
+      title: 'enqueue merge',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
   {
@@ -481,6 +571,12 @@ export const TOOL_DEFINITIONS = [
         },
       },
     },
+    annotations: {
+      title: 'list merge queue',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'process_merge_queue',
@@ -491,6 +587,12 @@ export const TOOL_DEFINITIONS = [
       properties: {
         limit: { type: 'number' },
       },
+    },
+    annotations: {
+      title: 'process merge queue',
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
     },
   },
   {
@@ -504,6 +606,12 @@ export const TOOL_DEFINITIONS = [
         name: { type: 'string' },
       },
     },
+    annotations: {
+      title: 'create branch',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'list_branches',
@@ -512,6 +620,12 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object',
       properties: {},
+    },
+    annotations: {
+      title: 'list branches',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
   {
@@ -527,6 +641,12 @@ export const TOOL_DEFINITIONS = [
         externalSubject: { type: 'string' },
       },
     },
+    annotations: {
+      title: 'link principal identity',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'resolve_principal_identity',
@@ -540,24 +660,48 @@ export const TOOL_DEFINITIONS = [
         externalSubject: { type: 'string' },
       },
     },
+    annotations: {
+      title: 'resolve principal identity',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'propose_change_set',
     description:
       'Propose a change instead of writing it. Every operation names a single field. The change set enters a review queue and lands only after a human approves it. Proposing a field outside your grant fails immediately with an error naming the field.',
     inputSchema: proposeChangeSetSchema,
+    annotations: {
+      title: 'propose change set',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'read_change_set_feedback',
     description:
       'Check the status of a change set you authored, including per-operation approvals, rejections and reviewer comments.',
     inputSchema: readChangeSetFeedbackSchema,
+    annotations: {
+      title: 'read change set feedback',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'review_change_set',
     description:
       'Approve or reject individual operations in a change set awaiting review.',
     inputSchema: reviewChangeSetSchema,
+    annotations: {
+      title: 'review change set',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   {
     name: 'apply_change_set',
@@ -569,5 +713,11 @@ export const TOOL_DEFINITIONS = [
     description:
       'Define a new collection in your workspace. Requires admin capability. Identifiers must match ^[a-z_][a-z0-9_]*$.',
     inputSchema: defineCollectionSchema,
+    annotations: {
+      title: 'define collection',
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    },
   },
 ] as const;

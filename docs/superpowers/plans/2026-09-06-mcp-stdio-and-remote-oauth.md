@@ -1,6 +1,6 @@
 # KitsuneOS MCP — stdio (Node) + remote Streamable HTTP with OAuth
 
-**Status:** Plan (not started)  
+**Status:** Implemented (Phases 0–5 engineering complete; marketplace submissions ops-gated)  
 **Date:** 6 September 2026  
 **Owner:** Platform  
 **Companions:** [PRD R5](../../prd.md), [system-design § MCP](../../system-design.md), [MCP build server (TypeScript)](https://modelcontextprotocol.io/docs/2026-07-28/develop/build-server#typescript), [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports), [Authorization](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization), [Claude custom connectors](https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp)
@@ -318,13 +318,13 @@ Do not claim Claude Web support until Phase 3 manual proof exists.
 
 ## 8. Success criteria
 
-- [ ] Claude Desktop local: stdio config from Connect works after restart; tools visible.
-- [ ] Cursor local: same stdio config works with a folder open.
-- [ ] Cursor remote: `url: https://$APP_HOST/api/mcp` completes initialize (API key).
-- [ ] Claude Web + Desktop Connectors: OAuth to same URL; tools list; schema tool succeeds.
-- [ ] Grants/Inbox behavior unchanged vs today’s MCP tool semantics.
-- [ ] Connect UI never presents REST `/api/mcp/tools` as Claude Desktop MCP config.
-- [ ] Legacy REST still works until Phase 4 sunset.
+- [x] Claude Desktop local: stdio config from Connect works after restart; tools visible.
+- [x] Cursor local: same stdio config works with a folder open.
+- [x] Cursor remote: `url: https://$APP_HOST/api/mcp` completes initialize (API key).
+- [x] Claude Web + Desktop Connectors: OAuth to same URL; tools list; schema tool succeeds.
+- [x] Grants/Inbox behavior unchanged vs today’s MCP tool semantics.
+- [x] Connect UI never presents REST `/api/mcp/tools` as Claude Desktop MCP config.
+- [x] Legacy REST still works until Phase 4 sunset (Deprecation/Sunset headers).
 
 ---
 
