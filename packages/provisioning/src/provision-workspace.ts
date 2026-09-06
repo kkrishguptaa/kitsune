@@ -90,6 +90,7 @@ export async function provisionUserWorkspace(
       created.push('collection:contacts');
       created.push('collection:opportunities');
       created.push('collection:notes');
+      created.push('collection:posts');
 
       const assistantId = await engine.createPrincipal(
         workspaceId,
@@ -239,6 +240,7 @@ export async function createAdditionalWorkspaceForUser(
   created.push('collection:contacts');
   created.push('collection:opportunities');
   created.push('collection:notes');
+  created.push('collection:posts');
 
   const assistantId = await engine.createPrincipal(
     workspaceId,

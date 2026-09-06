@@ -11,6 +11,7 @@ import {
   type FieldMeta,
   type RelationOption,
 } from '@/components/page/field-control';
+import { MediaLibrary } from '@/components/page/media-library';
 import { ShareDialog } from '@/components/page/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,13 @@ import {
   type OpenChangeRequestRef,
 } from '@/lib/group-ops-by-page';
 import { pageHref, pickBodyField, pickTitleField } from '@/lib/page';
+import {
+  isPublishableCollection,
+  normalizePublishStatus,
+  pickStatusField,
+  type PublishStatus,
+  publishStatusLabel,
+} from '@/lib/publish-status';
 import { recordLabel } from '@/lib/record-label';
 
 interface SchemaCollection {
@@ -135,6 +143,7 @@ export function PageView({
   const [backlinksLoading, setBacklinksLoading] = useState(false);
   const [revisionsLoading, setRevisionsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState('');
   const [dirty, setDirty] = useState(false);
   const [pendingChangeRequests, setPendingChangeRequests] = useState<
@@ -143,16 +152,28 @@ export function PageView({
 
   const titleField = useMemo(() => pickTitleField(fields), [fields]);
   const bodyField = useMemo(() => pickBodyField(fields), [fields]);
+  const statusField = useMemo(() => pickStatusField(fields), [fields]);
+  const publishable = useMemo(
+    () => isPublishableCollection(fields),
+    [fields],
+  );
   const propertyFields = useMemo(
     () =>
       fields.filter(
         (field) =>
           field.name !== 'id' &&
           field.name !== titleField?.name &&
-          field.name !== bodyField?.name,
+          field.name !== bodyField?.name &&
+          !(publishable && statusField && field.name === statusField.name),
       ),
-    [fields, titleField, bodyField],
+    [fields, titleField, bodyField, publishable, statusField],
   );
+  const currentStatus = useMemo(() => {
+    if (!statusField) return null;
+    return normalizePublishStatus(
+      draft[statusField.name] ?? cellText(row?.[statusField.name]),
+    );
+  }, [statusField, draft, row]);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -360,7 +381,29 @@ export function PageView({
     }
   }
 
+  async function setPublishStatus(next: PublishStatus) {
+    if (!statusField) return;
+    setPublishing(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/records/${collection}/${pageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { [statusField.name]: next } }),
+      });
+      const body = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(body.error ?? 'Status update failed');
+      await reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPublishing(false);
+    }
+  }
+
   const canDirectEdit = fields.some((field) => field.writable);
+  const canPublish =
+    Boolean(statusField?.writable) && canDirectEdit && !publishing;
 
   if (loading) {
     return (
@@ -424,8 +467,54 @@ export function PageView({
             >
               {pageId.slice(0, 8)}…
             </Badge>
+            {publishable && currentStatus ? (
+              <Badge
+                variant={
+                  currentStatus === 'published'
+                    ? 'default'
+                    : currentStatus === 'archived'
+                      ? 'outline'
+                      : 'secondary'
+                }
+                className="mt-2 ml-2 w-fit text-[10px] uppercase"
+              >
+                {publishStatusLabel(currentStatus)}
+              </Badge>
+            ) : null}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {publishable && statusField ? (
+              <>
+                {currentStatus !== 'published' ? (
+                  <Button
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('published')}
+                  >
+                    Publish
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('draft')}
+                  >
+                    Unpublish
+                  </Button>
+                )}
+                {currentStatus !== 'archived' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canPublish}
+                    onClick={() => void setPublishStatus('archived')}
+                  >
+                    Archive
+                  </Button>
+                ) : null}
+              </>
+            ) : null}
             <ShareDialog collection={collection} recordId={pageId} />
             <Button
               variant="outline"
@@ -702,6 +791,12 @@ export function PageView({
               This database has no prose body field.
             </p>
           )}
+          <MediaLibrary
+            collection={collection}
+            recordId={pageId}
+            fields={fields}
+            canUpload={canDirectEdit}
+          />
         </section>
       </div>
     </div>

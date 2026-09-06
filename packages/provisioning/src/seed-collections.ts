@@ -11,15 +11,34 @@ export const NOTES_DEFINITION = {
   ],
 };
 
+/** CMS starter: title/body plus draft|published|archived status enum. */
+export const POSTS_COLLECTION = 'posts';
+
+export const POSTS_DEFINITION = {
+  name: POSTS_COLLECTION,
+  fields: [
+    { name: 'title', type: 'text' as const, nullable: false },
+    { name: 'body', type: 'prose' as const },
+    {
+      name: 'status',
+      type: 'enum' as const,
+      nullable: false,
+      enumValues: ['draft', 'published', 'archived'],
+      indexed: true,
+    },
+  ],
+};
+
 export interface StarterCollectionIds {
   accountsId: string;
   contactsId: string;
   opportunitiesId: string;
   notesId: string;
+  postsId: string;
 }
 
 /**
- * CRM starter databases plus personal `notes` (title/body/tags).
+ * CRM starter databases, personal `notes`, and CMS `posts`.
  * Caller is responsible for grants and seed rows.
  */
 export async function defineStarterCollections(
@@ -76,8 +95,9 @@ export async function defineStarterCollections(
   });
 
   const notesId = await engine.defineCollection(workspaceId, NOTES_DEFINITION);
+  const postsId = await engine.defineCollection(workspaceId, POSTS_DEFINITION);
 
-  return { accountsId, contactsId, opportunitiesId, notesId };
+  return { accountsId, contactsId, opportunitiesId, notesId, postsId };
 }
 
 export async function grantOwnerOnStarters(
@@ -92,6 +112,7 @@ export async function grantOwnerOnStarters(
     [ids.contactsId, 'contacts'],
     [ids.opportunitiesId, 'opportunities'],
     [ids.notesId, NOTES_COLLECTION],
+    [ids.postsId, POSTS_COLLECTION],
   ] as const) {
     await engine.createGrant(
       workspaceId,
@@ -146,6 +167,15 @@ export async function grantAssistantOnStarters(
     ids.notesId,
     'propose',
     ['title', 'body', 'tags'],
+    null,
+    { actorId: ownerPrincipalId },
+  );
+  await engine.createGrant(
+    workspaceId,
+    assistantId,
+    ids.postsId,
+    'propose',
+    ['title', 'body', 'status'],
     null,
     { actorId: ownerPrincipalId },
   );
