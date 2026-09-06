@@ -479,4 +479,29 @@ CREATE INDEX IF NOT EXISTS oauth_access_tokens_app_idx
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON kitsune.oauth_apps TO kitsune_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON kitsune.oauth_access_tokens TO kitsune_app;
+
+-- ---------------------------------------------------------------------------
+-- Wiki-links extracted from prose (Obsidian-style [[Title]] / [[col:id]])
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS kitsune.page_links (
+  id                 uuid PRIMARY KEY,
+  workspace_id       uuid NOT NULL REFERENCES kitsune.workspaces(id) ON DELETE CASCADE,
+  from_collection_id uuid NOT NULL REFERENCES kitsune.collections(id) ON DELETE CASCADE,
+  from_record_id     uuid NOT NULL,
+  to_collection_id   uuid REFERENCES kitsune.collections(id) ON DELETE SET NULL,
+  to_record_id       uuid,
+  raw_target         text NOT NULL,
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (workspace_id, from_collection_id, from_record_id, raw_target)
+);
+CREATE INDEX IF NOT EXISTS page_links_from_idx
+  ON kitsune.page_links (workspace_id, from_collection_id, from_record_id);
+CREATE INDEX IF NOT EXISTS page_links_to_idx
+  ON kitsune.page_links (workspace_id, to_collection_id, to_record_id)
+  WHERE to_record_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS page_links_raw_idx
+  ON kitsune.page_links (workspace_id, raw_target);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON kitsune.page_links TO kitsune_app;
 `;

@@ -68,6 +68,12 @@ import {
   removeTeamMember,
 } from './org/memberships.js';
 import {
+  type BacklinksResult,
+  listBacklinks,
+  listVisibleWikiLinkEdges,
+  syncPageWikiLinks,
+} from './links/wiki-links.js';
+import {
   canViewPage,
   filterVisibleRecordIds,
 } from './org/page-access.js';
@@ -1976,6 +1982,131 @@ export class KitsuneEngine {
     await this.reindexRecord(workspaceId, collection, recordId);
   }
 
+  /** Extract and store [[wiki-links]] from prose after a successful write. */
+  private async maybeSyncWikiLinksAfterWrite(
+    workspaceId: string,
+    principalId: string,
+    collection: string,
+    recordId: string,
+  ): Promise<void> {
+    const schemaName = schemaNameForWorkspace(workspaceId);
+    const client = await this.appPool.connect();
+    try {
+      await client.query('BEGIN');
+      await setSessionContext(client, { schemaName, principalId });
+      const meta = await getCollectionMeta(client, workspaceId, collection);
+      if (!meta.fieldMeta.some((f) => f.type === 'prose')) {
+        await client.query('ROLLBACK');
+        return;
+      }
+      await syncPageWikiLinks(
+        client,
+        this.ownerPool,
+        workspaceId,
+        principalId,
+        schemaName,
+        collection,
+        recordId,
+      );
+      await client.query('COMMIT');
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {
+        // ignore
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Public re-sync for smoke / repair. */
+  async syncWikiLinks(
+    workspaceId: string,
+    principalId: string,
+    collection: string,
+    recordId: string,
+  ): Promise<void> {
+    await this.maybeSyncWikiLinksAfterWrite(
+      workspaceId,
+      principalId,
+      collection,
+      recordId,
+    );
+  }
+
+  async listBacklinks(
+    workspaceId: string,
+    principalId: string,
+    collection: string,
+    recordId: string,
+  ): Promise<BacklinksResult> {
+    const schemaName = schemaNameForWorkspace(workspaceId);
+    const client = await this.appPool.connect();
+    try {
+      await client.query('BEGIN');
+      await setSessionContext(client, { schemaName, principalId });
+      const result = await listBacklinks(
+        client,
+        this.ownerPool,
+        workspaceId,
+        principalId,
+        schemaName,
+        collection,
+        recordId,
+      );
+      await writeAuditInTxn(client, {
+        workspaceId,
+        principalId,
+        action: 'list_backlinks',
+        recordIds: [recordId],
+        outcome: 'allowed',
+        detail: { collection },
+      });
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async listWikiLinkEdges(
+    workspaceId: string,
+    principalId: string,
+  ): Promise<
+    Array<{
+      fromCollection: string;
+      fromRecordId: string;
+      toCollection: string;
+      toRecordId: string;
+      rawTarget: string;
+    }>
+  > {
+    const schemaName = schemaNameForWorkspace(workspaceId);
+    const client = await this.appPool.connect();
+    try {
+      await client.query('BEGIN');
+      await setSessionContext(client, { schemaName, principalId });
+      const edges = await listVisibleWikiLinkEdges(
+        client,
+        this.ownerPool,
+        workspaceId,
+        principalId,
+      );
+      await client.query('COMMIT');
+      return edges;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   /**
    * A relation value points at a row the author may not be allowed to see. Left to the
    * foreign key, the deferred constraint answers "does this row exist?" at COMMIT, which
@@ -2732,6 +2863,19 @@ export class KitsuneEngine {
             reindexError,
           );
         }
+        try {
+          await this.maybeSyncWikiLinksAfterWrite(
+            workspaceId,
+            changeSet.author_id,
+            collectionName,
+            recordId,
+          );
+        } catch (linkError) {
+          console.error(
+            'Wiki-link sync failed after applyChangeSet',
+            linkError,
+          );
+        }
       }
       try {
         await dispatchChangeSetApplied(this.ownerPool, {
@@ -2896,6 +3040,16 @@ export class KitsuneEngine {
           'Embedding reindex failed after directWrite',
           reindexError,
         );
+      }
+      try {
+        await this.maybeSyncWikiLinksAfterWrite(
+          workspaceId,
+          principalId,
+          collection,
+          recordIdOut,
+        );
+      } catch (linkError) {
+        console.error('Wiki-link sync failed after directWrite', linkError);
       }
       return recordIdOut;
     } catch (error) {

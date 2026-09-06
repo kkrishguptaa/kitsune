@@ -71,6 +71,17 @@ export type {
   ParsedIngestBatch,
 } from './ingest/types.js';
 export type {
+  BacklinkNeighbor,
+  BacklinksResult,
+  ParsedWikiLink,
+  WikiLinkEdge,
+} from './links/wiki-links.js';
+export {
+  extractWikiLinks,
+  parseWikiLinkInner,
+  proseToPlainText,
+} from './links/wiki-links.js';
+export type {
   MergeQueueEntry,
   MergeQueueStatus,
 } from './merge/queue.js';

@@ -137,6 +137,39 @@ export async function GET(request: Request) {
       }
     }
 
+    // Wiki-link edges (Obsidian-style) in addition to typed relations.
+    const wikiEdges = await engine.listWikiLinkEdges(
+      ctx.workspaceId,
+      ctx.principalId,
+    );
+    const edgeKeys = new Set(
+      edges.map((e) => `${e.from}->${e.to}:${e.field}`),
+    );
+    for (const wiki of wikiEdges) {
+      const fromKey = `${wiki.fromCollection}:${wiki.fromRecordId}`;
+      const toKey = `${wiki.toCollection}:${wiki.toRecordId}`;
+      // Include edge when either endpoint is already in the graph neighborhood,
+      // or when browsing the full workspace graph (no focus).
+      const include =
+        !focusCollection ||
+        !focusRecordId ||
+        seen.has(fromKey) ||
+        seen.has(toKey);
+      if (!include) continue;
+      if (!seen.has(fromKey)) {
+        await addRecord(wiki.fromCollection, wiki.fromRecordId, 0);
+      }
+      if (!seen.has(toKey)) {
+        await addRecord(wiki.toCollection, wiki.toRecordId, 0);
+      }
+      if (!seen.has(fromKey) || !seen.has(toKey)) continue;
+      const field = `wiki:${wiki.rawTarget}`;
+      const dedupe = `${fromKey}->${toKey}:${field}`;
+      if (edgeKeys.has(dedupe)) continue;
+      edgeKeys.add(dedupe);
+      edges.push({ from: fromKey, to: toKey, field });
+    }
+
     return NextResponse.json({
       nodes,
       edges,
