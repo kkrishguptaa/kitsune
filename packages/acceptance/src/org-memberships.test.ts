@@ -39,7 +39,9 @@ describe('Accounts, workspaces, and teams', () => {
       displayName: 'Invitee',
     });
 
-    const beforeClaim = await engine.listWorkspaceMemberships(owner.workspaceId);
+    const beforeClaim = await engine.listWorkspaceMemberships(
+      owner.workspaceId,
+    );
     const pending = beforeClaim.find((m) => m.email === inviteEmail);
     expect(pending?.userId).toBeNull();
     expect(pending?.principalId).toBe(invited.principalId);
@@ -92,11 +94,14 @@ describe('Accounts, workspaces, and teams', () => {
     );
     const opportunitiesId = collections.rows[0]?.id;
     expect(opportunitiesId).toBeTruthy();
+    if (!opportunitiesId) {
+      throw new Error('expected opportunities collection');
+    }
 
     await engine.createGrant(
       owner.workspaceId,
       team.principalId,
-      opportunitiesId!,
+      opportunitiesId,
       'read',
       null,
       null,

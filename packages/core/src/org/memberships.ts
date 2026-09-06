@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
-import { KitsuneError } from '../types.js';
 import type {
   TeamSummary,
   WorkspaceMembership,
   WorkspaceRole,
 } from '../types.js';
+import { KitsuneError } from '../types.js';
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();

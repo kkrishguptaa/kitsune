@@ -21,7 +21,6 @@ interface TeamRow {
   memberPrincipalIds: string[];
 }
 
-
 interface PersonRow {
   principalId: string;
   email: string;

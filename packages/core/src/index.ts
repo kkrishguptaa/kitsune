@@ -58,17 +58,6 @@ export {
 export type { ApplyFaultInjection, EngineOptions } from './engine.js';
 export { DEFAULT_CONFIG, KitsuneEngine } from './engine.js';
 export {
-  addTeamMember,
-  claimInvitesForUser,
-  createTeamRow,
-  ensureOwnerMembership,
-  inviteWorkspaceMember,
-  listMembershipsForUser,
-  listMembershipsForWorkspace,
-  listTeams,
-  removeTeamMember,
-} from './org/memberships.js';
-export {
   assertFieldAllowed,
   loadResolvedGrant,
   projectFields,
@@ -85,6 +74,17 @@ export type {
   MergeQueueEntry,
   MergeQueueStatus,
 } from './merge/queue.js';
+export {
+  addTeamMember,
+  claimInvitesForUser,
+  createTeamRow,
+  ensureOwnerMembership,
+  inviteWorkspaceMember,
+  listMembershipsForUser,
+  listMembershipsForWorkspace,
+  listTeams,
+  removeTeamMember,
+} from './org/memberships.js';
 export {
   type SweepCollectionResult,
   type SweepRevisionsResult,

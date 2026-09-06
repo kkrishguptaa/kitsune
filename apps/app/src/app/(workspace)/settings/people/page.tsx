@@ -128,7 +128,9 @@ export default function SettingsPeoplePage() {
               ) : (
                 people.map((person) => (
                   <TableRow key={person.id}>
-                    <TableCell className="font-medium">{person.email}</TableCell>
+                    <TableCell className="font-medium">
+                      {person.email}
+                    </TableCell>
                     <TableCell>
                       {ROLE_LABELS[person.role] ?? person.role}
                     </TableCell>

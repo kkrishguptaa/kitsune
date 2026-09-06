@@ -59,6 +59,15 @@ import {
   type MergeQueueStatus,
 } from './merge/queue.js';
 import {
+  addTeamMember,
+  createTeamRow,
+  inviteWorkspaceMember,
+  listMembershipsForUser,
+  listMembershipsForWorkspace,
+  listTeams as listTeamRows,
+  removeTeamMember,
+} from './org/memberships.js';
+import {
   type SweepRevisionsResult,
   sweepExpiredRevisions,
 } from './revisions/sweep.js';
@@ -116,15 +125,6 @@ import {
   quoteIdent,
   schemaNameForWorkspace,
 } from './types.js';
-import {
-  addTeamMember,
-  createTeamRow,
-  inviteWorkspaceMember,
-  listMembershipsForUser,
-  listMembershipsForWorkspace,
-  listTeams as listTeamRows,
-  removeTeamMember,
-} from './org/memberships.js';
 import {
   fieldFileName,
   parseVfsPath,
