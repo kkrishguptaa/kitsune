@@ -98,11 +98,10 @@ export function AgentsPanel() {
   return (
     <section className="space-y-3 rounded-lg border border-border p-4">
       <div>
-        <h3 className="text-sm font-medium">Agent profiles</h3>
+        <h3 className="text-sm font-medium">Agents</h3>
         <p className="text-sm text-muted-foreground">
-          Named agents with their own API tokens. Each agent is a first-class
-          principal with grant-scoped access and Supermemory-style{' '}
-          <code className="text-xs">memory_*</code> tools over pages it can see.
+          Named agents with their own API tokens. Grant each agent access to the
+          pages and databases it should use.
         </p>
       </div>
       <div className="flex flex-wrap items-end gap-2">

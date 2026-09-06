@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       name,
     );
 
-    // Ensure a durable agent_memory database the agent can write (Supermemory path).
+    // Ensure a durable agent_memory database the agent can write.
     const existingMemory = await engine.ownerPool.query<{ id: string }>(
       `SELECT id FROM kitsune.collections
         WHERE workspace_id = $1 AND name = 'agent_memory'`,

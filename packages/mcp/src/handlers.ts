@@ -51,7 +51,7 @@ export function createMcpHandlers(
       return engine.search(ctx.workspaceId, ctx.principalId, args);
     },
 
-    /** Supermemory-style: semantic recall across grant-visible workspace prose. */
+    /** Semantic recall across grant-visible workspace prose. */
     async memory_search(args: {
       query: string;
       collections?: string[];

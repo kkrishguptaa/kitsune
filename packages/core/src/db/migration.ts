@@ -481,7 +481,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON kitsune.oauth_apps TO kitsune_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON kitsune.oauth_access_tokens TO kitsune_app;
 
 -- ---------------------------------------------------------------------------
--- Wiki-links extracted from prose (Obsidian-style [[Title]] / [[col:id]])
+-- Wiki-links extracted from prose ([[Title]] / [[col:id]])
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS kitsune.page_links (
