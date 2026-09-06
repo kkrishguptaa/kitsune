@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS kitsune.principals (
   kind          text NOT NULL CHECK (kind IN ('human','agent','service')),
   display_name  text NOT NULL,
   acts_for      uuid REFERENCES kitsune.principals(id),
-  disabled_at   timestamptz
+  disabled_at   timestamptz,
+  created_at    timestamptz NOT NULL DEFAULT now()
 );
 
 -- R16: stable external identity so the same subject can be resolved across workspaces.
@@ -354,6 +355,11 @@ ALTER TABLE kitsune.principals DROP CONSTRAINT IF EXISTS kitsune_principals_kind
 ALTER TABLE kitsune.principals
   ADD CONSTRAINT principals_kind_check
   CHECK (kind IN ('human', 'agent', 'service', 'team'));
+
+-- Older installs created principals without created_at; Connect key rotate and
+-- agent listing ORDER BY this column.
+ALTER TABLE kitsune.principals
+  ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now();
 
 -- users = login account (WorkOS). workspace_id/principal_id remain the
 -- last-active workspace pointers (nullable after backfill).
