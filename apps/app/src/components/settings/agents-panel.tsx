@@ -19,8 +19,8 @@ export function AgentsPanel() {
   const [error, setError] = useState('');
   const [plaintext, setPlaintext] = useState<string | null>(null);
 
-  const reload = useCallback(async () => {
-    const response = await fetch('/api/agents');
+  const reload = useCallback(async (signal?: AbortSignal) => {
+    const response = await fetch('/api/agents', { signal });
     const body = (await response.json()) as {
       agents?: AgentRow[];
       error?: string;
@@ -34,7 +34,12 @@ export function AgentsPanel() {
   }, []);
 
   useEffect(() => {
-    void reload();
+    const controller = new AbortController();
+    void reload(controller.signal).catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      setError('Could not load agents');
+    });
+    return () => controller.abort();
   }, [reload]);
 
   async function createAgent() {
@@ -60,6 +65,8 @@ export function AgentsPanel() {
       setPlaintext(body.apiKeyPlaintext ?? null);
       setName('');
       await reload();
+    } catch {
+      setError('Could not create agent');
     } finally {
       setBusy(false);
     }
@@ -90,6 +97,8 @@ export function AgentsPanel() {
       }
       setPlaintext(body.apiKeyPlaintext ?? null);
       await reload();
+    } catch {
+      setError('Could not rotate token');
     } finally {
       setBusy(false);
     }
@@ -113,6 +122,13 @@ export function AgentsPanel() {
             onChange={(event) => setName(event.target.value)}
             placeholder="Research assistant"
             className="w-56"
+            disabled={busy}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                void createAgent();
+              }
+            }}
           />
         </div>
         <Button
@@ -120,7 +136,7 @@ export function AgentsPanel() {
           disabled={busy || !name.trim()}
           onClick={() => void createAgent()}
         >
-          Create agent
+          {busy ? 'Working…' : 'Create agent'}
         </Button>
       </div>
       {plaintext ? (
@@ -136,9 +152,7 @@ export function AgentsPanel() {
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <ul className="space-y-2">
         {agents.length === 0 ? (
-          <li className="text-sm text-muted-foreground">
-            No agent profiles yet.
-          </li>
+          <li className="text-sm text-muted-foreground">No agents yet.</li>
         ) : (
           agents.map((agent) => (
             <li
@@ -149,8 +163,7 @@ export function AgentsPanel() {
                 <p className="font-medium">{agent.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {agent.activeKeyCount} active token
-                  {agent.activeKeyCount === 1 ? '' : 's'} ·{' '}
-                  {agent.id.slice(0, 8)}…
+                  {agent.activeKeyCount === 1 ? '' : 's'}
                 </p>
               </div>
               <Button

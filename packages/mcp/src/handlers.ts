@@ -123,7 +123,7 @@ export function createMcpHandlers(
         } catch (error) {
           return {
             error:
-              'agent_memory database is missing and this agent cannot create it. Ask a workspace admin to create an agent profile (Connect → Agent profiles) or grant define access.',
+              'agent_memory database is missing and this agent cannot create it. Ask a workspace admin to create the database (Connect → Agents) or grant define access.',
             detail: error instanceof Error ? error.message : String(error),
           };
         }

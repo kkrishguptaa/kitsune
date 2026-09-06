@@ -7,7 +7,7 @@ import {
   requireWorkspaceAdmin,
 } from '@/lib/require-workspace';
 
-/** List agent profiles in the active workspace. */
+/** List agents in the active workspace. */
 export async function GET() {
   try {
     const ctx = await requireWorkspace();
@@ -41,7 +41,7 @@ export async function GET() {
   }
 }
 
-/** Create an agent profile (admin). */
+/** Create an agent (admin). */
 export async function POST(request: Request) {
   try {
     const ctx = await requireWorkspace();
