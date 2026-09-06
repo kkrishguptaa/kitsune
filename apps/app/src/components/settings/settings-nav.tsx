@@ -2,15 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { SETTINGS_TABS } from '@/lib/settings-tabs';
 import { cn } from '@/lib/utils';
-
-const TABS = [
-  { href: '/settings/workspace', label: 'Account' },
-  { href: '/settings/people', label: 'People' },
-  { href: '/settings/teams', label: 'Teams' },
-  { href: '/settings/access', label: 'Access' },
-  { href: '/settings/connect', label: 'Connect AI' },
-];
 
 export function SettingsNav() {
   const pathname = usePathname();
@@ -21,7 +14,7 @@ export function SettingsNav() {
         Workspace account, people, access, and AI connections.
       </p>
       <nav className="mt-3 flex flex-wrap gap-4" aria-label="Settings">
-        {TABS.map((tab) => {
+        {SETTINGS_TABS.map((tab) => {
           const active =
             pathname === tab.href || pathname.startsWith(`${tab.href}/`);
           return (

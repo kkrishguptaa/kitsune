@@ -15,9 +15,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { isValidSchemaName } from '@/lib/schema-names';
 import { notifyWorkspaceChanged } from '@/lib/workspace-events';
-
-const DATABASE_NAME_RE = /^[a-z_][a-z0-9_]*$/;
 
 export function CreateDatabaseDialog({
   trigger,
@@ -38,7 +37,7 @@ export function CreateDatabaseDialog({
 
   async function createDatabase() {
     const trimmed = name.trim();
-    if (!DATABASE_NAME_RE.test(trimmed)) {
+    if (!isValidSchemaName(trimmed)) {
       setError('Use a simple lowercase name like accounts or deals.');
       return;
     }

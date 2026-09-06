@@ -19,6 +19,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { isValidSchemaName } from '@/lib/schema-names';
 import { notifyWorkspaceChanged } from '@/lib/workspace-events';
 
 interface PropertyMeta {
@@ -40,8 +41,6 @@ const PROPERTY_TYPES = [
   'relation',
   'prose',
 ] as const;
-
-const PROPERTY_NAME_RE = /^[a-z_][a-z0-9_]*$/;
 
 async function mutateSchema(payload: Record<string, unknown>) {
   const response = await fetch('/api/schema/mutate', {
@@ -126,7 +125,7 @@ export function DatabasePropertiesSheet({
   async function addProperty() {
     const trimmedName = newName.trim();
     if (!trimmedName) return;
-    if (!PROPERTY_NAME_RE.test(trimmedName)) {
+    if (!isValidSchemaName(trimmedName)) {
       setError('Use a simple lowercase name like status or owner_id.');
       return;
     }
