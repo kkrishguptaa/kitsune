@@ -105,6 +105,20 @@
 **Key conversion action:** Email “Join early access” (`support@kitsuneos.com`).  
 **Current metrics:** Pre-launch / early access.
 
+## Activation (MPTV)
+
+**Aha moment:** A human write exists in a shared database *and* an agent proposal appears in Inbox for approve/reject.  
+**Minimum path to value (4 steps):**
+
+1. Create a database (shared table)
+2. Add a page (first human write)
+3. Connect an AI helper (MCP key + config)
+4. Open Inbox (know where reviews land; complete when a proposal arrives or Inbox is visited)
+
+**In-product:** dismissible setup checklist, first-run empty state on `/`, guided empty states on collection + Inbox, Connect framed as step 3 of 4.  
+**Signup expectation:** Early access email → invite → WorkOS signup → land in empty workspace with checklist (no multi-field registration in-app).
+
 ## Changelog
 
 - **v1 (2026-09-06):** Auto-drafted from `docs/prd.md` + current marketing site for landing rewrite.
+- **v1.1 (2026-09-06):** Added Activation / MPTV for onboarding + signup skill alignment.

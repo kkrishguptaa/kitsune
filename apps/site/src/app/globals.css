@@ -338,6 +338,18 @@ button:focus-visible {
   margin-top: var(--k-space-6);
 }
 
+.band-note {
+  margin-top: var(--k-space-4);
+  font-size: 0.875rem;
+  color: var(--k-muted);
+}
+
+.band-note a {
+  color: var(--k-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .site-footer {
   width: min(68rem, calc(100% - 2rem));
   margin: 0 auto;

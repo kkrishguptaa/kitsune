@@ -1,4 +1,4 @@
-import { contactMailto, earlyAccessMailto } from '@/lib/urls';
+import { contactMailto, earlyAccessMailto, signUpUrl } from '@/lib/urls';
 
 export default function LandingPage() {
   return (
@@ -110,16 +110,22 @@ export default function LandingPage() {
         <h2>Get early access</h2>
         <p>
           We’re onboarding carefully. Tell us about your team and the agents
-          you’re shipping — we’ll make room.
+          you’re shipping. After you get in: create a database, add a page,
+          connect an AI helper, and review its first proposal in Inbox — usually
+          in one sitting.
         </p>
         <div className="hero-actions">
           <a className="cta cta-primary" href={earlyAccessMailto}>
             Request early access
           </a>
-          <a className="cta cta-secondary" href={contactMailto}>
-            support@kitsuneos.com
+          <a className="cta cta-secondary" href={signUpUrl}>
+            Have an invite? Sign up
           </a>
         </div>
+        <p className="band-note">
+          Questions?{' '}
+          <a href={contactMailto}>support@kitsuneos.com</a>
+        </p>
       </section>
     </main>
   );
