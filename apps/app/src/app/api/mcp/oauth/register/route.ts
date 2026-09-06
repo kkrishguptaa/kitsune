@@ -3,7 +3,8 @@ import { engine } from '@/lib/engine';
 import {
   ensureMcpOAuthTables,
   hashClientSecret,
-  newClientSecret} from '@/lib/mcp-oauth';
+  newClientSecret,
+} from '@/lib/mcp-oauth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

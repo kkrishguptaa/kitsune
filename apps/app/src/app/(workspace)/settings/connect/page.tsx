@@ -5,11 +5,7 @@ import { SettingsNav } from '@/components/settings/settings-nav';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
-type GuideId =
-  | 'local'
-  | 'cursor-remote'
-  | 'claude-remote'
-  | 'rest';
+type GuideId = 'local' | 'cursor-remote' | 'claude-remote' | 'rest';
 
 export default function SettingsConnectPage() {
   const [origin, setOrigin] = useState('');

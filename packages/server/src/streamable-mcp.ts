@@ -4,10 +4,7 @@ import { createKitsuneMcpServer } from '@kitsuneos/mcp';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { checkRateLimit } from './rate-limit.js';
 import type { CredentialContext } from './resolve-credential.js';
-import {
-  auditAuthFailure,
-  resolveCredential,
-} from './resolve-credential.js';
+import { auditAuthFailure, resolveCredential } from './resolve-credential.js';
 
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://claude.ai',
@@ -23,9 +20,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
 export interface StreamableMcpOptions {
   allowedOrigins?: string[];
   resourceMetadataUrl?: string;
-  resolveOAuthCredential?: (
-    token: string,
-  ) => Promise<CredentialContext | null>;
+  resolveOAuthCredential?: (token: string) => Promise<CredentialContext | null>;
 }
 
 function unauthorizedResponse(resourceMetadataUrl?: string): Response {

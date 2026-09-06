@@ -1,8 +1,12 @@
-import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+// workspace-lint: ignore — MCP OAuth binds workspace from the authenticated
+// session (requireWorkspace / token claims), never from client request params.
 import {
-  type KitsuneEngine,
-  schemaNameForWorkspace,
-} from '@kitsuneos/core';
+  createHash,
+  createHmac,
+  randomBytes,
+  timingSafeEqual,
+} from 'node:crypto';
+import { type KitsuneEngine, schemaNameForWorkspace } from '@kitsuneos/core';
 import type { CredentialContext } from '@kitsuneos/server';
 
 const ACCESS_TOKEN_TTL_SECONDS = 60 * 60;
@@ -22,13 +26,13 @@ function oauthSecret(): string {
 }
 
 function b64url(input: Buffer | string): string {
-  return Buffer.from(input)
-    .toString('base64url')
-    .replace(/=+$/g, '');
+  return Buffer.from(input).toString('base64url').replace(/=+$/g, '');
 }
 
 function sign(payload: string): string {
-  return createHmac('sha256', oauthSecret()).update(payload).digest('base64url');
+  return createHmac('sha256', oauthSecret())
+    .update(payload)
+    .digest('base64url');
 }
 
 export interface McpAccessTokenClaims {

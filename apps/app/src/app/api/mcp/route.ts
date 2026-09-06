@@ -22,8 +22,7 @@ async function handle(request: Request): Promise<Response> {
   return handleStreamableMcpRequest(engine, request, {
     allowedOrigins: allowedOriginsFromEnv(),
     resourceMetadataUrl: resourceMetadataUrl(request),
-    resolveOAuthCredential: (token) =>
-      resolveMcpOAuthCredential(engine, token),
+    resolveOAuthCredential: (token) => resolveMcpOAuthCredential(engine, token),
   });
 }
 

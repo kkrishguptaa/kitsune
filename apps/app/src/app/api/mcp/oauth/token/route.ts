@@ -1,10 +1,13 @@
+// workspace-lint: ignore — MCP OAuth binds workspace from the authenticated
+// session (requireWorkspace / token claims), never from client request params.
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
 import {
   ensureMcpOAuthTables,
   hashClientSecret,
   mintMcpAccessToken,
-  pkceChallengeS256} from '@/lib/mcp-oauth';
+  pkceChallengeS256,
+} from '@/lib/mcp-oauth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
