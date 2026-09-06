@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
-import {
-  type CollectionMeta,
-  getCollectionMeta,
-} from '../compiler/query.js';
+import { type CollectionMeta, getCollectionMeta } from '../compiler/query.js';
 import { queryRows } from '../db/pool.js';
 import { assertFieldAllowed, loadResolvedGrant } from '../grants/resolve.js';
 import { canViewPage } from '../org/page-access.js';
@@ -75,8 +72,7 @@ export function proseToPlainText(content: string): string {
 export function parseWikiLinkInner(inner: string): ParsedWikiLink {
   const pipe = inner.indexOf('|');
   const targetPart = (pipe >= 0 ? inner.slice(0, pipe) : inner).trim();
-  const alias =
-    pipe >= 0 ? inner.slice(pipe + 1).trim() || null : null;
+  const alias = pipe >= 0 ? inner.slice(pipe + 1).trim() || null : null;
 
   const colon = targetPart.indexOf(':');
   if (colon > 0) {

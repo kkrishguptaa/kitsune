@@ -3,15 +3,12 @@
  * Run: pnpm --filter @kitsuneos/core exec tsx ../../scripts/notes-capture-smoke.ts
  * (from repo) or: node --import tsx packages/core/scripts/notes-capture-smoke.ts
  */
-import {
-  createPools,
-  getPageAccess,
-  KitsuneEngine,
-} from '../src/index.ts';
+
 import {
   ensureNotesCollection,
   NOTES_COLLECTION,
 } from '../../provisioning/src/seed-collections.ts';
+import { createPools, getPageAccess, KitsuneEngine } from '../src/index.ts';
 
 const ownerUrl =
   process.env.KITSUNE_OWNER_URL ??
@@ -81,10 +78,7 @@ async function main() {
       recordId,
     });
     assert(access?.visibility === 'private', 'visibility should be private');
-    assert(
-      access.ownerPrincipalId === principalId,
-      'owner should be creator',
-    );
+    assert(access.ownerPrincipalId === principalId, 'owner should be creator');
     console.log(`create: private ok recordId=${recordId}`);
 
     const rows = await engine.query(workspaceId, principalId, {

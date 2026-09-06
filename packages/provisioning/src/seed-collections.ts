@@ -82,12 +82,7 @@ export async function defineStarterCollections(
         name: 'stage',
         type: 'enum',
         nullable: false,
-        enumValues: [
-          'prospecting',
-          'negotiation',
-          'closed_won',
-          'closed_lost',
-        ],
+        enumValues: ['prospecting', 'negotiation', 'closed_won', 'closed_lost'],
         indexed: true,
       },
       { name: 'next_step', type: 'prose' },

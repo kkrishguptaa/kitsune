@@ -93,7 +93,9 @@ export function OAuthAppsPanel() {
   return (
     <section className="space-y-3 rounded-lg border border-border p-4">
       <div>
-        <h3 className="text-sm font-medium">OAuth apps (Kitsune as database)</h3>
+        <h3 className="text-sm font-medium">
+          OAuth apps (Kitsune as database)
+        </h3>
         <p className="text-sm text-muted-foreground">
           Third-party apps register here, then use{' '}
           <code className="text-xs">POST /api/oauth/token</code> (client

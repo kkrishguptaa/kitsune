@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AgentsPanel } from '@/components/settings/agents-panel';
+import { OAuthAppsPanel } from '@/components/settings/oauth-apps-panel';
 import { SettingsNav } from '@/components/settings/settings-nav';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { AgentsPanel } from '@/components/settings/agents-panel';
-import { OAuthAppsPanel } from '@/components/settings/oauth-apps-panel';
 
 type GuideId = 'cursor' | 'claude' | 'custom';
 

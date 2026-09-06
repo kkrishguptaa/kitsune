@@ -52,6 +52,12 @@ import {
 import { assertFieldAllowed, loadResolvedGrant } from './grants/resolve.js';
 import type { IngestRequest, IngestResult } from './ingest/types.js';
 import {
+  type BacklinksResult,
+  listBacklinks,
+  listVisibleWikiLinkEdges,
+  syncPageWikiLinks,
+} from './links/wiki-links.js';
+import {
   claimNextMergeQueueEntry,
   completeMergeQueueEntry,
   insertMergeQueueEntry,
@@ -68,16 +74,7 @@ import {
   listTeams as listTeamRows,
   removeTeamMember,
 } from './org/memberships.js';
-import {
-  type BacklinksResult,
-  listBacklinks,
-  listVisibleWikiLinkEdges,
-  syncPageWikiLinks,
-} from './links/wiki-links.js';
-import {
-  canViewPage,
-  filterVisibleRecordIds,
-} from './org/page-access.js';
+import { canViewPage, filterVisibleRecordIds } from './org/page-access.js';
 import {
   type SweepRevisionsResult,
   sweepExpiredRevisions,
@@ -1008,7 +1005,11 @@ export class KitsuneEngine {
         compiled.sql,
         compiled.params,
       );
-      const meta = await getCollectionMeta(client, workspaceId, request.collection);
+      const meta = await getCollectionMeta(
+        client,
+        workspaceId,
+        request.collection,
+      );
       await writeAuditInTxn(client, {
         workspaceId,
         principalId,

@@ -27,9 +27,7 @@ interface WorkspaceMembershipRow {
 
 export function WorkspaceSwitcher() {
   const router = useRouter();
-  const [memberships, setMemberships] = useState<WorkspaceMembershipRow[]>(
-    [],
-  );
+  const [memberships, setMemberships] = useState<WorkspaceMembershipRow[]>([]);
   const [activeName, setActiveName] = useState('Workspace');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

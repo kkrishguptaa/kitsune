@@ -1,4 +1,9 @@
-import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import {
+  createHash,
+  randomBytes,
+  randomUUID,
+  timingSafeEqual,
+} from 'node:crypto';
 import type { Pool } from 'pg';
 import { KitsuneError } from '../types.js';
 
@@ -6,10 +11,7 @@ const CLIENT_ID_PREFIX = 'ko_app_';
 const CLIENT_SECRET_PREFIX = 'kosec_';
 const ACCESS_TOKEN_PREFIX = 'koat_';
 
-export type OAuthScope =
-  | 'databases:create'
-  | 'records:read'
-  | 'records:write';
+export type OAuthScope = 'databases:create' | 'records:read' | 'records:write';
 
 export interface OAuthAppSummary {
   id: string;
@@ -180,7 +182,10 @@ export async function issueOAuthClientCredentialsToken(
     [input.clientId],
   );
   const row = app.rows[0];
-  if (!row || !safeEqualHex(hashSecret(input.clientSecret), row.client_secret_hash)) {
+  if (
+    !row ||
+    !safeEqualHex(hashSecret(input.clientSecret), row.client_secret_hash)
+  ) {
     throw new KitsuneError('Invalid client credentials', 'forbidden');
   }
   const accessToken = generateOAuthAccessToken();

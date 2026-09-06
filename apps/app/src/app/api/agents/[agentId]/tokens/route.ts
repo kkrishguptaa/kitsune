@@ -1,4 +1,8 @@
-import { createApiKey, KitsuneError, revokeApiKeysForPrincipal } from '@kitsuneos/core';
+import {
+  createApiKey,
+  KitsuneError,
+  revokeApiKeysForPrincipal,
+} from '@kitsuneos/core';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
 import { jsonError } from '@/lib/http-error';

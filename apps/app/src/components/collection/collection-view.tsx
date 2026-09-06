@@ -44,10 +44,10 @@ import { pageHref } from '@/lib/page';
 import {
   isPublishableCollection,
   normalizePublishStatus,
-  pickStatusField,
-  type PublishStatus,
-  publishStatusLabel,
   PUBLISH_STATUSES,
+  type PublishStatus,
+  pickStatusField,
+  publishStatusLabel,
 } from '@/lib/publish-status';
 import { recordLabel } from '@/lib/record-label';
 
@@ -248,10 +248,7 @@ export function CollectionView({ collection }: { collection: string }) {
 
   const canDirectEdit = fields.some((field) => field.writable);
   const statusField = useMemo(() => pickStatusField(fields), [fields]);
-  const publishable = useMemo(
-    () => isPublishableCollection(fields),
-    [fields],
-  );
+  const publishable = useMemo(() => isPublishableCollection(fields), [fields]);
 
   const visibleFields = useMemo(
     () => fields.filter((f) => !view.hiddenColumns.includes(f.name)),

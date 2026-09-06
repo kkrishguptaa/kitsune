@@ -3,13 +3,13 @@
 import { FilePlus2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
+  type KeyboardEvent as ReactKeyboardEvent,
   useCallback,
   useEffect,
   useId,
   useRef,
   useState,
   useTransition,
-  type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import {
   Dialog,
@@ -259,12 +259,12 @@ export function CommandPalette() {
           {error ? (
             <p className="px-3 py-2 text-sm text-destructive">{error}</p>
           ) : null}
-          <ul className="px-1" role="listbox" aria-labelledby={inputId}>
+          <div className="px-1" role="listbox" aria-labelledby={inputId}>
             {items.map((item, index) => {
               const active = index === activeIndex;
               if (item.kind === 'action') {
                 return (
-                  <li key={item.id}>
+                  <div key={item.id}>
                     <button
                       type="button"
                       role="option"
@@ -283,11 +283,11 @@ export function CommandPalette() {
                         {creating ? 'Creating…' : item.hint}
                       </span>
                     </button>
-                  </li>
+                  </div>
                 );
               }
               return (
-                <li key={item.id}>
+                <div key={item.id}>
                   <button
                     type="button"
                     role="option"
@@ -299,16 +299,18 @@ export function CommandPalette() {
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={() => activate(item)}
                   >
-                    <span className="text-sm font-medium">{item.hit.label}</span>
+                    <span className="text-sm font-medium">
+                      {item.hit.label}
+                    </span>
                     <span className="truncate text-xs text-muted-foreground">
                       {item.hit.collection}
                       {item.hit.excerpt ? ` · ${item.hit.excerpt}` : ''}
                     </span>
                   </button>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
           {query.trim() && results.length === 0 && !error ? (
             <p className="px-3 py-2 text-sm text-muted-foreground">
               No matching pages

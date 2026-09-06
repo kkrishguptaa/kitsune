@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { pageHref } from '@/lib/page';
 import { Button } from '@/components/ui/button';
+import { pageHref } from '@/lib/page';
 
 interface GraphNode {
   id: string;
@@ -116,8 +116,15 @@ export default function GraphPage() {
             if (!position) return null;
             const recordId = node.id.slice(node.collection.length + 1);
             return (
-              <g key={node.id} transform={`translate(${position.x},${position.y})`}>
-                <circle r={18} className="fill-primary/15 stroke-primary" strokeWidth={1.5} />
+              <g
+                key={node.id}
+                transform={`translate(${position.x},${position.y})`}
+              >
+                <circle
+                  r={18}
+                  className="fill-primary/15 stroke-primary"
+                  strokeWidth={1.5}
+                />
                 <a href={pageHref(recordId, node.collection)}>
                   <title>{`${node.collection}: ${node.label}`}</title>
                   <text

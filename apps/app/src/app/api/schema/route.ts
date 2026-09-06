@@ -8,11 +8,7 @@ export async function GET(request: Request) {
     const ctx = await resolveRequestAuth(request);
     // Backfill personal notes for workspaces provisioned before notes shipped.
     if (ctx.authKind === 'session') {
-      await ensureNotesCollection(
-        engine,
-        ctx.workspaceId,
-        ctx.principalId,
-      );
+      await ensureNotesCollection(engine, ctx.workspaceId, ctx.principalId);
     }
     const schema = await engine.describeSchema(
       ctx.workspaceId,

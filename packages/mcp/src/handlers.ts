@@ -58,7 +58,11 @@ export function createMcpHandlers(
       limit?: number;
     }) {
       const ctx = getContext();
-      const result = await engine.search(ctx.workspaceId, ctx.principalId, args);
+      const result = await engine.search(
+        ctx.workspaceId,
+        ctx.principalId,
+        args,
+      );
       return {
         memories: result.hits.map((hit) => ({
           collection: hit.collection,

@@ -28,7 +28,8 @@ export function pickStatusField<T extends PublishFieldMeta>(
   fields: readonly T[],
 ): T | undefined {
   const enums = fields.filter(
-    (field) => field.type === 'enum' && hasPublishStatusValues(field.enumValues),
+    (field) =>
+      field.type === 'enum' && hasPublishStatusValues(field.enumValues),
   );
   const named = enums.find((field) => field.name === 'status');
   return named ?? enums[0];

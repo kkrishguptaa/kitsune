@@ -126,14 +126,20 @@ export function AgentsPanel() {
       </div>
       {plaintext ? (
         <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-          <p className="font-medium">Copy this token now — it won&apos;t be shown again.</p>
-          <code className="mt-1 block break-all font-mono text-xs">{plaintext}</code>
+          <p className="font-medium">
+            Copy this token now — it won&apos;t be shown again.
+          </p>
+          <code className="mt-1 block break-all font-mono text-xs">
+            {plaintext}
+          </code>
         </div>
       ) : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <ul className="space-y-2">
         {agents.length === 0 ? (
-          <li className="text-sm text-muted-foreground">No agent profiles yet.</li>
+          <li className="text-sm text-muted-foreground">
+            No agent profiles yet.
+          </li>
         ) : (
           agents.map((agent) => (
             <li
@@ -144,7 +150,8 @@ export function AgentsPanel() {
                 <p className="font-medium">{agent.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {agent.activeKeyCount} active token
-                  {agent.activeKeyCount === 1 ? '' : 's'} · {agent.id.slice(0, 8)}…
+                  {agent.activeKeyCount === 1 ? '' : 's'} ·{' '}
+                  {agent.id.slice(0, 8)}…
                 </p>
               </div>
               <Button

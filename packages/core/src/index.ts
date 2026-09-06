@@ -38,12 +38,12 @@ export type {
   PlanUsageSnapshot,
 } from './billing/plan-limits.js';
 export {
-  FREE_PLAN_LIMITS,
-  PRO_PLAN_LIMITS,
   assertPlanLimit,
+  FREE_PLAN_LIMITS,
   limitsForPlan,
   loadPlanUsage,
   loadWorkspacePlan,
+  PRO_PLAN_LIMITS,
   planIdFromSubscriptionStatus,
   userHasPaidWorkspace,
 } from './billing/plan-limits.js';
@@ -113,11 +113,6 @@ export {
   removeTeamMember,
   switchActiveWorkspace,
 } from './org/memberships.js';
-export type {
-  PageShareCapability,
-  PageAccessState,
-  PageVisibility,
-} from './org/page-access.js';
 export type { OAuthAppSummary, OAuthScope } from './org/oauth-apps.js';
 export {
   createOAuthApp,
@@ -126,6 +121,11 @@ export {
   resolveOAuthAccessToken,
   revokeOAuthApp,
 } from './org/oauth-apps.js';
+export type {
+  PageAccessState,
+  PageShareCapability,
+  PageVisibility,
+} from './org/page-access.js';
 export {
   canViewPage,
   effectivePrincipalIds,

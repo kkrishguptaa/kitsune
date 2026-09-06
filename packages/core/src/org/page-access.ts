@@ -104,7 +104,10 @@ export async function upsertPageVisibility(
       input.actorPrincipalId,
     );
     if (!admin) {
-      throw new KitsuneError('Only the page owner can change visibility', 'forbidden');
+      throw new KitsuneError(
+        'Only the page owner can change visibility',
+        'forbidden',
+      );
     }
   }
   await pool.query(
@@ -240,11 +243,7 @@ export async function canViewPage(
   if (!access || access.visibility === 'workspace') return true;
   if (access.ownerPrincipalId === input.principalId) return true;
   if (
-    await principalIsWorkspaceAdmin(
-      pool,
-      input.workspaceId,
-      input.principalId,
-    )
+    await principalIsWorkspaceAdmin(pool, input.workspaceId, input.principalId)
   ) {
     return true;
   }
@@ -254,9 +253,7 @@ export async function canViewPage(
     input.workspaceId,
     input.principalId,
   );
-  return access.shares.some((share) =>
-    effective.includes(share.principalId),
-  );
+  return access.shares.some((share) => effective.includes(share.principalId));
 }
 
 /** Filter record ids down to those visible to the principal. */

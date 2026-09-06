@@ -110,7 +110,10 @@ async function main() {
         collectionId,
         recordId,
       });
-      assert(access?.visibility === 'shared', 'visibility should become shared');
+      assert(
+        access?.visibility === 'shared',
+        'visibility should become shared',
+      );
       assert(
         access.shares.some((share) => share.principalId === otherId),
         'share row present',

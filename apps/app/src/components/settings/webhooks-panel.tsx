@@ -318,7 +318,9 @@ export function WebhooksPanel() {
                       <TableCell className="text-xs">
                         {delivery.eventType}
                       </TableCell>
-                      <TableCell className="text-xs">{delivery.status}</TableCell>
+                      <TableCell className="text-xs">
+                        {delivery.status}
+                      </TableCell>
                       <TableCell className="text-xs">
                         {delivery.attemptCount}
                       </TableCell>

@@ -222,8 +222,7 @@ export async function createAdditionalWorkspaceForUser(
   const created: string[] = [];
   const activate = input.activate !== false;
   const displayName =
-    input.name?.trim() ||
-    `Workspace ${new Date().toISOString().slice(0, 10)}`;
+    input.name?.trim() || `Workspace ${new Date().toISOString().slice(0, 10)}`;
 
   const slug = `ws-${uuidv4().replace(/-/g, '').slice(0, 16)}`;
   const { workspaceId, schemaName } = await engine.createWorkspace(slug);

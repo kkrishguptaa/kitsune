@@ -8,7 +8,9 @@ import {
 
 const PRIVATE_HEADERS = { 'Cache-Control': 'no-store' };
 
-async function assistantPrincipalId(workspaceId: string): Promise<string | null> {
+async function assistantPrincipalId(
+  workspaceId: string,
+): Promise<string | null> {
   const result = await engine.ownerPool.query<{ id: string }>(
     `SELECT id FROM kitsune.principals
       WHERE workspace_id = $1

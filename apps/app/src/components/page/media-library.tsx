@@ -2,12 +2,12 @@
 
 import type { AttachmentMeta } from '@kitsuneos/core';
 import {
+  type ChangeEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
 } from 'react';
 import type { FieldMeta } from '@/components/page/field-control';
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,13 @@
 'use client';
 
-import { Bell, Network, Plus, Settings, StickyNote, Table2 } from 'lucide-react';
+import {
+  Bell,
+  Network,
+  Plus,
+  Settings,
+  StickyNote,
+  Table2,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -46,7 +53,9 @@ export function AppSidebar() {
         const next = body.collections ?? [];
         setHasNotes(next.some((collection) => collection.name === 'notes'));
         // Keep Notes pinned above; avoid duplicating it in the generic list.
-        setCollections(next.filter((collection) => collection.name !== 'notes'));
+        setCollections(
+          next.filter((collection) => collection.name !== 'notes'),
+        );
       })
       .catch(() => undefined);
 

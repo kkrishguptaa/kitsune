@@ -1,7 +1,4 @@
-import {
-  KitsuneError,
-  listMembershipsForUser,
-} from '@kitsuneos/core';
+import { KitsuneError, listMembershipsForUser } from '@kitsuneos/core';
 import { createAdditionalWorkspaceForUser } from '@kitsuneos/provisioning';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';

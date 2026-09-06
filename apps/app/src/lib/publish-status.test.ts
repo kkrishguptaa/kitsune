@@ -3,17 +3,13 @@ import { describe, it } from 'node:test';
 import {
   hasPublishStatusValues,
   isPublishableCollection,
-  pickStatusField,
   PUBLISH_STATUSES,
+  pickStatusField,
 } from './publish-status.ts';
 
 describe('publish-status', () => {
   it('exports draft|published|archived', () => {
-    assert.deepEqual([...PUBLISH_STATUSES], [
-      'draft',
-      'published',
-      'archived',
-    ]);
+    assert.deepEqual([...PUBLISH_STATUSES], ['draft', 'published', 'archived']);
   });
 
   it('detects publishable collections via status enum', () => {

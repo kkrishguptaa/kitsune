@@ -25,8 +25,8 @@ import { pageHref, pickBodyField, pickTitleField } from '@/lib/page';
 import {
   isPublishableCollection,
   normalizePublishStatus,
-  pickStatusField,
   type PublishStatus,
+  pickStatusField,
   publishStatusLabel,
 } from '@/lib/publish-status';
 import { recordLabel } from '@/lib/record-label';
@@ -153,10 +153,7 @@ export function PageView({
   const titleField = useMemo(() => pickTitleField(fields), [fields]);
   const bodyField = useMemo(() => pickBodyField(fields), [fields]);
   const statusField = useMemo(() => pickStatusField(fields), [fields]);
-  const publishable = useMemo(
-    () => isPublishableCollection(fields),
-    [fields],
-  );
+  const publishable = useMemo(() => isPublishableCollection(fields), [fields]);
   const propertyFields = useMemo(
     () =>
       fields.filter(
@@ -720,9 +717,7 @@ export function PageView({
                     </p>
                     <ul className="space-y-1.5">
                       {backlinks.incoming.map((link) => (
-                        <li
-                          key={`wiki-in-${link.collection}-${link.recordId}`}
-                        >
+                        <li key={`wiki-in-${link.collection}-${link.recordId}`}>
                           <Link
                             href={pageHref(link.recordId, link.collection)}
                             className="text-primary underline-offset-4 hover:underline"

@@ -2,16 +2,17 @@
  * Smoke: wiki-link extraction, page_links storage, and backlinks API shape.
  * Run: node --import tsx packages/core/scripts/wiki-links-smoke.ts
  */
+
+import {
+  ensureNotesCollection,
+  NOTES_COLLECTION,
+} from '../../provisioning/src/seed-collections.ts';
 import {
   createPools,
   extractWikiLinks,
   KitsuneEngine,
   migrate,
 } from '../src/index.ts';
-import {
-  ensureNotesCollection,
-  NOTES_COLLECTION,
-} from '../../provisioning/src/seed-collections.ts';
 
 const ownerUrl =
   process.env.KITSUNE_OWNER_URL ??
@@ -99,7 +100,10 @@ async function main() {
         ORDER BY raw_target`,
       [workspaceId, ensured.collectionId, sourceId],
     );
-    assert(linkRows.rows.length === 2, `expected 2 link rows, got ${linkRows.rows.length}`);
+    assert(
+      linkRows.rows.length === 2,
+      `expected 2 link rows, got ${linkRows.rows.length}`,
+    );
     const resolved = linkRows.rows.find((r) => r.to_record_id === otherId);
     const unresolved = linkRows.rows.find((r) => r.to_record_id === null);
     assert(resolved, 'resolved link should point at target note');
@@ -136,7 +140,9 @@ async function main() {
       'source outgoing should include target',
     );
     assert(
-      sourceLinks.outgoing.some((n) => !n.recordId && n.rawTarget.includes('No Such Page')),
+      sourceLinks.outgoing.some(
+        (n) => !n.recordId && n.rawTarget.includes('No Such Page'),
+      ),
       'source outgoing should include unresolved raw target',
     );
     console.log('listBacklinks: shape ok');

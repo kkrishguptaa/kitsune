@@ -1,6 +1,6 @@
 'use client';
 
-import { EditorContent, useEditor, type Editor } from '@tiptap/react';
+import { type Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -18,8 +18,7 @@ const SLASH_ITEMS: SlashItem[] = [
     id: 'heading',
     label: 'Heading',
     hint: 'H2',
-    run: (editor) =>
-      editor.chain().focus().toggleHeading({ level: 2 }).run(),
+    run: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run(),
   },
   {
     id: 'bullet',
@@ -395,7 +394,9 @@ function markdownToHtml(markdown: string): string {
     const line = raw ?? '';
     if (line.startsWith('```')) {
       if (inCode) {
-        html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
+        html.push(
+          `<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`,
+        );
         codeBuffer = [];
         inCode = false;
       } else {
@@ -501,7 +502,9 @@ function htmlToMarkdown(html: string): string {
     .replace(/<i>(.*?)<\/i>/gi, '*$1*')
     .replace(/<code>(.*?)<\/code>/gi, '`$1`')
     .replace(/<[^>]+>/g, '');
-  return decodeHtml(withBreaks).replace(/\n{3,}/g, '\n\n').trim();
+  return decodeHtml(withBreaks)
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function inline(text: string): string {

@@ -1,7 +1,4 @@
-import {
-  canViewPage,
-  filterVisibleRecordIds,
-} from '@kitsuneos/core';
+import { canViewPage, filterVisibleRecordIds } from '@kitsuneos/core';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
 import { jsonError } from '@/lib/http-error';
@@ -37,10 +34,9 @@ export async function GET(request: Request) {
     const idRows = await engine.ownerPool.query<{
       id: string;
       name: string;
-    }>(
-      `SELECT id, name FROM kitsune.collections WHERE workspace_id = $1`,
-      [ctx.workspaceId],
-    );
+    }>(`SELECT id, name FROM kitsune.collections WHERE workspace_id = $1`, [
+      ctx.workspaceId,
+    ]);
     const collectionIdByName = new Map(
       idRows.rows.map((row) => [row.name, row.id] as const),
     );
@@ -142,9 +138,7 @@ export async function GET(request: Request) {
       ctx.workspaceId,
       ctx.principalId,
     );
-    const edgeKeys = new Set(
-      edges.map((e) => `${e.from}->${e.to}:${e.field}`),
-    );
+    const edgeKeys = new Set(edges.map((e) => `${e.from}->${e.to}:${e.field}`));
     for (const wiki of wikiEdges) {
       const fromKey = `${wiki.fromCollection}:${wiki.fromRecordId}`;
       const toKey = `${wiki.toCollection}:${wiki.toRecordId}`;
