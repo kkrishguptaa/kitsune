@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { CreateDatabaseDialog } from '@/components/collection/create-database-dialog';
+import { WorkspaceSwitcher } from '@/components/shell/workspace-switcher';
 import { Badge } from '@/components/ui/badge';
 import {
   Sidebar,
@@ -69,7 +70,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-3 py-4">
-        <Link href="/" className="flex items-center gap-2 px-1">
+        <Link href="/" className="mb-2 flex items-center gap-2 px-1">
           <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold tracking-tight">
             K
           </div>
@@ -77,6 +78,7 @@ export function AppSidebar() {
             Kitsune<span className="text-primary">OS</span>
           </span>
         </Link>
+        <WorkspaceSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

@@ -84,6 +84,7 @@ export {
   listMembershipsForWorkspace,
   listTeams,
   removeTeamMember,
+  switchActiveWorkspace,
 } from './org/memberships.js';
 export {
   type SweepCollectionResult,
