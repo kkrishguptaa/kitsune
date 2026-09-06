@@ -121,7 +121,7 @@ export default function SettingsConnectPage() {
     } finally {
       setBusy(false);
     }
-  }, [apiKey, hasApiKey]);
+  }, [hasApiKey]);
 
   async function copyText(label: string, text: string) {
     try {
@@ -143,9 +143,10 @@ export default function SettingsConnectPage() {
           </p>
           <h2 className="text-lg font-medium">Connect an AI helper</h2>
           <p className="text-sm text-muted-foreground">
-            Create a key, paste MCP config into Cursor or Claude, then ask the
-            helper to propose a change. Proposals land in Inbox — that is your
-            first agent review.
+            Create a helper key, paste MCP config into Cursor or Claude, then
+            ask the helper to propose a change. The key acts as your workspace
+            assistant (suggest-only) — proposals land in Inbox for review, and
+            do not write as you.
           </p>
         </div>
 
@@ -158,10 +159,13 @@ export default function SettingsConnectPage() {
         <section className="space-y-3 rounded-lg border border-border p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-sm font-medium">1. Your connection key</h3>
+              <h3 className="text-sm font-medium">
+                1. Assistant connection key
+              </h3>
               <p className="text-xs text-muted-foreground">
-                Treat this like a password. Anyone with it can act as you in
-                KitsuneOS. It is shown once when created.
+                Treat this like a password. It lets an AI helper suggest changes
+                for Inbox review — it cannot publish writes as you. Shown once
+                when created.
               </p>
             </div>
             <Button

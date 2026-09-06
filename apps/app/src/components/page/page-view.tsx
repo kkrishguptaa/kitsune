@@ -24,6 +24,7 @@ import { recordLabel } from '@/lib/record-label';
 
 interface SchemaCollection {
   name: string;
+  capability?: string;
   fields: FieldMeta[];
 }
 
@@ -107,6 +108,7 @@ export function PageView({
 }) {
   const router = useRouter();
   const [fields, setFields] = useState<FieldMeta[]>([]);
+  const [capability, setCapability] = useState('');
   const [row, setRow] = useState<Record<string, JsonValue> | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [relationOptions, setRelationOptions] = useState<
@@ -154,6 +156,7 @@ export function PageView({
         throw new Error(`Database not found: ${collection}`);
       }
       setFields(meta.fields);
+      setCapability(meta.capability ?? '');
 
       const getRes = await fetch(`/api/records/${collection}/${pageId}`);
       const getBody = (await getRes.json()) as Record<string, JsonValue> & {
@@ -299,6 +302,8 @@ export function PageView({
     }
   }
 
+  const canDirectEdit = fields.some((field) => field.writable);
+
   if (loading) {
     return (
       <div className="space-y-4 p-8">
@@ -357,8 +362,9 @@ export function PageView({
             <Badge
               variant="secondary"
               className="mt-2 w-fit font-mono text-[10px]"
+              title={pageId}
             >
-              {pageId}
+              {pageId.slice(0, 8)}…
             </Badge>
           </div>
           <div className="flex gap-2">
@@ -371,7 +377,7 @@ export function PageView({
             </Button>
             <Button
               size="sm"
-              disabled={saving || !dirty}
+              disabled={saving || !dirty || !canDirectEdit}
               onClick={() => void savePage()}
             >
               {saving ? 'Saving…' : 'Save'}
@@ -381,6 +387,20 @@ export function PageView({
         {error ? (
           <p className="mt-2 text-sm text-destructive">{error}</p>
         ) : null}
+        {!canDirectEdit ? (
+          <div className="mt-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+            {capability === 'propose'
+              ? 'You can suggest changes via an AI helper or Inbox — this view is read-only for your access level.'
+              : 'You can view this page, but your access does not include editing here.'}{' '}
+            <Link
+              href="/inbox"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Open Inbox
+            </Link>
+          </div>
+        ) : null}
+
         {pendingChangeRequests.length > 0 ? (
           <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
             <p className="font-medium">

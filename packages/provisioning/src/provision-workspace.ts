@@ -159,13 +159,31 @@ export async function provisionUserWorkspace(
       await engine.createGrant(
         workspaceId,
         assistantId,
+        accountsId,
+        'propose',
+        null,
+        null,
+        { actorId: principalId },
+      );
+      await engine.createGrant(
+        workspaceId,
+        assistantId,
+        contactsId,
+        'propose',
+        null,
+        null,
+        { actorId: principalId },
+      );
+      await engine.createGrant(
+        workspaceId,
+        assistantId,
         opportunitiesId,
         'propose',
         ['name', 'stage', 'next_step'],
         null,
         { actorId: principalId },
       );
-      created.push('grant:assistant:opportunities');
+      created.push('grant:assistant:collections');
 
       const accountId = uuidv4();
       await engine.directWrite(
@@ -184,7 +202,8 @@ export async function provisionUserWorkspace(
       });
       created.push('seed');
 
-      const apiKey = await createApiKey(engine.ownerPool, principalId);
+      // Connect keys belong to the assistant agent (propose-only), not the human.
+      const apiKey = await createApiKey(engine.ownerPool, assistantId);
       created.push('api_key');
 
       // Persist one-time reveal: /api/schema often provisions first and drops

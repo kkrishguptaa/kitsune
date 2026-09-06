@@ -45,6 +45,7 @@ import { recordLabel } from '@/lib/record-label';
 
 interface SchemaCollection {
   name: string;
+  capability?: string;
   fields: FieldMeta[];
 }
 
@@ -139,6 +140,8 @@ function relationLabel(
 export function CollectionView({ collection }: { collection: string }) {
   const router = useRouter();
   const [fields, setFields] = useState<FieldMeta[]>([]);
+  const [capability, setCapability] = useState('');
+  const [truncated, setTruncated] = useState(false);
   const [rows, setRows] = useState<Array<Record<string, JsonValue>>>([]);
   const [relationOptions, setRelationOptions] = useState<
     Record<string, RelationOption[]>
@@ -189,6 +192,7 @@ export function CollectionView({ collection }: { collection: string }) {
         throw new Error(`Database not found: ${target}`);
       }
       setFields(meta.fields);
+      setCapability(meta.capability ?? '');
 
       const fieldNames = meta.fields.map((f) => f.name);
       const queryRes = await fetch('/api/query', {
@@ -208,7 +212,9 @@ export function CollectionView({ collection }: { collection: string }) {
         throw new Error(queryBody.error ?? 'Query failed');
       }
       if (collectionRef.current !== target) return;
-      setRows(queryBody.rows ?? []);
+      const loaded = queryBody.rows ?? [];
+      setRows(loaded);
+      setTruncated(loaded.length >= 100);
       setRelationOptions(
         await loadRelationOptions(schemaBody.collections ?? []),
       );
@@ -227,6 +233,8 @@ export function CollectionView({ collection }: { collection: string }) {
     setRelationOptions({});
     void reload();
   }, [reload]);
+
+  const canDirectEdit = fields.some((field) => field.writable);
 
   const visibleFields = useMemo(
     () => fields.filter((f) => !view.hiddenColumns.includes(f.name)),
@@ -359,7 +367,7 @@ export function CollectionView({ collection }: { collection: string }) {
           <SlidersHorizontal />
           Properties
         </Button>
-        <Button size="sm" onClick={openCreate}>
+        <Button size="sm" disabled={!canDirectEdit} onClick={openCreate}>
           <Plus />
           New page
         </Button>
@@ -368,6 +376,20 @@ export function CollectionView({ collection }: { collection: string }) {
       {error ? (
         <p className="border-b border-border px-6 py-2 text-sm text-destructive">
           {error}
+        </p>
+      ) : null}
+
+      {truncated ? (
+        <p className="border-b border-border px-6 py-2 text-sm text-muted-foreground">
+          Showing the first 100 pages. Narrow with search, or open a page from
+          Inbox / related links if you need something outside this list.
+        </p>
+      ) : null}
+      {!canDirectEdit ? (
+        <p className="border-b border-border px-6 py-2 text-sm text-muted-foreground">
+          {capability === 'propose'
+            ? 'Your access can suggest changes (via AI / Inbox) but not edit pages directly here.'
+            : 'Your access to this database is view-only.'}
         </p>
       ) : null}
 
@@ -414,7 +436,11 @@ export function CollectionView({ collection }: { collection: string }) {
                             can propose updates here.
                           </p>
                         </div>
-                        <Button size="sm" onClick={openCreate}>
+                        <Button
+                          size="sm"
+                          disabled={!canDirectEdit}
+                          onClick={openCreate}
+                        >
                           <Plus />
                           Create first page
                         </Button>
