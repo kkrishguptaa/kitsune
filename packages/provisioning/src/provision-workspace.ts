@@ -5,6 +5,11 @@ import {
   ensureOwnerMembership,
 } from '@kitsuneos/core';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  defineStarterCollections,
+  grantAssistantOnStarters,
+  grantOwnerOnStarters,
+} from './seed-collections.js';
 
 export interface ProvisionUserInput {
   workosId: string;
@@ -80,57 +85,11 @@ export async function provisionUserWorkspace(
       );
       created.push('principal');
 
-      const accountsId = await engine.defineCollection(workspaceId, {
-        name: 'accounts',
-        fields: [
-          { name: 'name', type: 'text', nullable: false },
-          { name: 'industry', type: 'text' },
-        ],
-      });
+      const ids = await defineStarterCollections(engine, workspaceId);
       created.push('collection:accounts');
-
-      const contactsId = await engine.defineCollection(workspaceId, {
-        name: 'contacts',
-        fields: [
-          {
-            name: 'account_id',
-            type: 'relation',
-            relationTarget: 'accounts',
-            nullable: false,
-          },
-          { name: 'name', type: 'text', nullable: false },
-          { name: 'email', type: 'text' },
-        ],
-      });
       created.push('collection:contacts');
-
-      const opportunitiesId = await engine.defineCollection(workspaceId, {
-        name: 'opportunities',
-        fields: [
-          {
-            name: 'account_id',
-            type: 'relation',
-            relationTarget: 'accounts',
-            nullable: false,
-          },
-          { name: 'name', type: 'text', nullable: false },
-          { name: 'amount', type: 'number' },
-          {
-            name: 'stage',
-            type: 'enum',
-            nullable: false,
-            enumValues: [
-              'prospecting',
-              'negotiation',
-              'closed_won',
-              'closed_lost',
-            ],
-            indexed: true,
-          },
-          { name: 'next_step', type: 'prose' },
-        ],
-      });
       created.push('collection:opportunities');
+      created.push('collection:notes');
 
       const assistantId = await engine.createPrincipal(
         workspaceId,
@@ -139,49 +98,19 @@ export async function provisionUserWorkspace(
       );
       created.push('principal:assistant');
 
-      for (const [collectionId, collectionName] of [
-        [accountsId, 'accounts'],
-        [contactsId, 'contacts'],
-        [opportunitiesId, 'opportunities'],
-      ] as const) {
-        await engine.createGrant(
-          workspaceId,
-          principalId,
-          collectionId,
-          'admin',
-          null,
-          null,
-          { actorId: principalId },
-        );
-        created.push(`grant:owner:${collectionName}`);
-      }
-
-      await engine.createGrant(
+      await grantOwnerOnStarters(
+        engine,
         workspaceId,
-        assistantId,
-        accountsId,
-        'propose',
-        null,
-        null,
-        { actorId: principalId },
+        principalId,
+        ids,
+        created,
       );
-      await engine.createGrant(
+      await grantAssistantOnStarters(
+        engine,
         workspaceId,
+        principalId,
         assistantId,
-        contactsId,
-        'propose',
-        null,
-        null,
-        { actorId: principalId },
-      );
-      await engine.createGrant(
-        workspaceId,
-        assistantId,
-        opportunitiesId,
-        'propose',
-        ['name', 'stage', 'next_step'],
-        null,
-        { actorId: principalId },
+        ids,
       );
       created.push('grant:assistant:collections');
 
@@ -305,57 +234,11 @@ export async function createAdditionalWorkspaceForUser(
   );
   created.push('principal');
 
-  const accountsId = await engine.defineCollection(workspaceId, {
-    name: 'accounts',
-    fields: [
-      { name: 'name', type: 'text', nullable: false },
-      { name: 'industry', type: 'text' },
-    ],
-  });
+  const ids = await defineStarterCollections(engine, workspaceId);
   created.push('collection:accounts');
-
-  const contactsId = await engine.defineCollection(workspaceId, {
-    name: 'contacts',
-    fields: [
-      {
-        name: 'account_id',
-        type: 'relation',
-        relationTarget: 'accounts',
-        nullable: false,
-      },
-      { name: 'name', type: 'text', nullable: false },
-      { name: 'email', type: 'text' },
-    ],
-  });
   created.push('collection:contacts');
-
-  const opportunitiesId = await engine.defineCollection(workspaceId, {
-    name: 'opportunities',
-    fields: [
-      {
-        name: 'account_id',
-        type: 'relation',
-        relationTarget: 'accounts',
-        nullable: false,
-      },
-      { name: 'name', type: 'text', nullable: false },
-      { name: 'amount', type: 'number' },
-      {
-        name: 'stage',
-        type: 'enum',
-        nullable: false,
-        enumValues: [
-          'prospecting',
-          'negotiation',
-          'closed_won',
-          'closed_lost',
-        ],
-        indexed: true,
-      },
-      { name: 'next_step', type: 'prose' },
-    ],
-  });
   created.push('collection:opportunities');
+  created.push('collection:notes');
 
   const assistantId = await engine.createPrincipal(
     workspaceId,
@@ -364,49 +247,13 @@ export async function createAdditionalWorkspaceForUser(
   );
   created.push('principal:assistant');
 
-  for (const [collectionId, collectionName] of [
-    [accountsId, 'accounts'],
-    [contactsId, 'contacts'],
-    [opportunitiesId, 'opportunities'],
-  ] as const) {
-    await engine.createGrant(
-      workspaceId,
-      principalId,
-      collectionId,
-      'admin',
-      null,
-      null,
-      { actorId: principalId },
-    );
-    created.push(`grant:owner:${collectionName}`);
-  }
-
-  await engine.createGrant(
+  await grantOwnerOnStarters(engine, workspaceId, principalId, ids, created);
+  await grantAssistantOnStarters(
+    engine,
     workspaceId,
+    principalId,
     assistantId,
-    accountsId,
-    'propose',
-    null,
-    null,
-    { actorId: principalId },
-  );
-  await engine.createGrant(
-    workspaceId,
-    assistantId,
-    contactsId,
-    'propose',
-    null,
-    null,
-    { actorId: principalId },
-  );
-  await engine.createGrant(
-    workspaceId,
-    assistantId,
-    opportunitiesId,
-    'propose',
-    ['name', 'stage', 'next_step'],
-    null,
-    { actorId: principalId },
+    ids,
   );
   created.push('grant:assistant:collections');
 
@@ -459,3 +306,9 @@ export async function createAdditionalWorkspaceForUser(
     created,
   };
 }
+
+export {
+  ensureNotesCollection,
+  NOTES_COLLECTION,
+  NOTES_DEFINITION,
+} from './seed-collections.js';

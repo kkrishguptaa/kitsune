@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Network, Plus, Settings, Table2 } from 'lucide-react';
+import { Bell, Network, Plus, Settings, StickyNote, Table2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,10 +28,13 @@ interface SchemaCollection {
   capability: string;
 }
 
+const NOTES_HREF = '/c/notes';
+
 export function AppSidebar() {
   const pathname = usePathname();
   const [collections, setCollections] = useState<SchemaCollection[]>([]);
   const [inboxCount, setInboxCount] = useState(0);
+  const [hasNotes, setHasNotes] = useState(false);
 
   const reload = useCallback(() => {
     void fetch('/api/schema')
@@ -40,7 +43,10 @@ export function AppSidebar() {
         const body = (await response.json()) as {
           collections?: SchemaCollection[];
         };
-        setCollections(body.collections ?? []);
+        const next = body.collections ?? [];
+        setHasNotes(next.some((collection) => collection.name === 'notes'));
+        // Keep Notes pinned above; avoid duplicating it in the generic list.
+        setCollections(next.filter((collection) => collection.name !== 'notes'));
       })
       .catch(() => undefined);
 
@@ -67,6 +73,9 @@ export function AppSidebar() {
     reload();
   }, [pathname, reload]);
 
+  const notesActive =
+    pathname === NOTES_HREF || pathname.startsWith(`${NOTES_HREF}/`);
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-3 py-4">
@@ -81,6 +90,27 @@ export function AppSidebar() {
         <WorkspaceSwitcher />
       </SidebarHeader>
       <SidebarContent>
+        {hasNotes ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Personal</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={notesActive}
+                    tooltip="Notes"
+                  >
+                    <Link href={NOTES_HREF}>
+                      <StickyNote />
+                      <span>Notes</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
         <SidebarGroup>
           <SidebarGroupLabel>Databases</SidebarGroupLabel>
           <CreateDatabaseDialog

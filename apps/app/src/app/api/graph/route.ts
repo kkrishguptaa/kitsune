@@ -1,3 +1,7 @@
+import {
+  canViewPage,
+  filterVisibleRecordIds,
+} from '@kitsuneos/core';
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
 import { jsonError } from '@/lib/http-error';
@@ -5,6 +9,13 @@ import { requireWorkspace } from '@/lib/require-workspace';
 
 /**
  * Graph distribution API — nodes/edges for Obsidian-like views and exporters.
+ *
+ * Visibility: engine.query / engine.readRecord already post-filter via
+ * filterVisibleRecordIds / canViewPage. We still drop nodes that fail an
+ * explicit ACL check so private pages never appear in the graph payload.
+ *
+ * TODO(compiler-acl): push page_access into compiled predicates so neighbors
+ * never load private rows before this filter.
  */
 export async function GET(request: Request) {
   try {
@@ -13,23 +24,58 @@ export async function GET(request: Request) {
     const focusCollection = url.searchParams.get('collection');
     const focusRecordId = url.searchParams.get('recordId');
     const depthParam = Number(url.searchParams.get('depth') ?? '1');
-    const maxDepth = Math.min(3, Math.max(1, Number.isFinite(depthParam) ? depthParam : 1));
+    const maxDepth = Math.min(
+      3,
+      Math.max(1, Number.isFinite(depthParam) ? depthParam : 1),
+    );
 
-    const schema = await engine.describeSchema(ctx.workspaceId, ctx.principalId);
+    const schema = await engine.describeSchema(
+      ctx.workspaceId,
+      ctx.principalId,
+    );
     const collections = schema.collections ?? [];
+    const idRows = await engine.ownerPool.query<{
+      id: string;
+      name: string;
+    }>(
+      `SELECT id, name FROM kitsune.collections WHERE workspace_id = $1`,
+      [ctx.workspaceId],
+    );
+    const collectionIdByName = new Map(
+      idRows.rows.map((row) => [row.name, row.id] as const),
+    );
 
     const nodes: Array<{ id: string; collection: string; label: string }> = [];
     const edges: Array<{ from: string; to: string; field: string }> = [];
     const seen = new Set<string>();
-    const depthLeft = new Map<string, number>();
 
-    async function addRecord(collection: string, recordId: string, remaining: number) {
+    async function isVisible(
+      collection: string,
+      recordId: string,
+    ): Promise<boolean> {
+      const collectionId = collectionIdByName.get(collection);
+      if (!collectionId) return false;
+      return canViewPage(engine.ownerPool, {
+        workspaceId: ctx.workspaceId,
+        collectionId,
+        recordId,
+        principalId: ctx.principalId,
+      });
+    }
+
+    async function addRecord(
+      collection: string,
+      recordId: string,
+      remaining: number,
+    ) {
       const key = `${collection}:${recordId}`;
       if (seen.has(key)) {
         return;
       }
+      if (!(await isVisible(collection, recordId))) {
+        return;
+      }
       seen.add(key);
-      depthLeft.set(key, remaining);
       const record = await engine.readRecord(
         ctx.workspaceId,
         ctx.principalId,
@@ -51,13 +97,17 @@ export async function GET(request: Request) {
       );
       for (const edge of related.outgoing) {
         const targetKey = `${edge.collection}:${edge.recordId}`;
-        edges.push({ from: key, to: targetKey, field: edge.field });
-        await addRecord(edge.collection, edge.recordId, remaining - 1);
+        if (await isVisible(edge.collection, edge.recordId)) {
+          edges.push({ from: key, to: targetKey, field: edge.field });
+          await addRecord(edge.collection, edge.recordId, remaining - 1);
+        }
       }
       for (const edge of related.incoming) {
         const sourceKey = `${edge.collection}:${edge.recordId}`;
-        edges.push({ from: sourceKey, to: key, field: edge.field });
-        await addRecord(edge.collection, edge.recordId, remaining - 1);
+        if (await isVisible(edge.collection, edge.recordId)) {
+          edges.push({ from: sourceKey, to: key, field: edge.field });
+          await addRecord(edge.collection, edge.recordId, remaining - 1);
+        }
       }
     }
 
@@ -69,10 +119,20 @@ export async function GET(request: Request) {
           collection: collection.name,
           limit: 20,
         });
-        for (const row of rows) {
-          if (typeof row.id === 'string') {
-            await addRecord(collection.name, row.id, 1);
-          }
+        const ids = rows
+          .map((row) => row.id)
+          .filter((id): id is string => typeof id === 'string');
+        // Belt-and-braces: re-run visibility even though query already filters.
+        const collectionId = collectionIdByName.get(collection.name);
+        if (!collectionId) continue;
+        const visible = await filterVisibleRecordIds(engine.ownerPool, {
+          workspaceId: ctx.workspaceId,
+          collectionId,
+          recordIds: ids,
+          principalId: ctx.principalId,
+        });
+        for (const id of visible) {
+          await addRecord(collection.name, id, 1);
         }
       }
     }

@@ -1002,6 +1002,8 @@ export class KitsuneEngine {
       const ids = rows
         .map((row) => row.id)
         .filter((id): id is string => typeof id === 'string');
+      // TODO(compiler-acl): compile page_access into row predicates instead of
+      // post-filtering after grant-scoped SELECT.
       const visible = new Set(
         await filterVisibleRecordIds(this.ownerPool, {
           workspaceId,
@@ -1177,7 +1179,33 @@ export class KitsuneEngine {
         detail: { collection },
       });
       await client.query('COMMIT');
-      return result;
+      // TODO(compiler-acl): page_access should compile into neighbor SQL.
+      // Until then, post-filter related edges with canViewPage.
+      const filterNeighbors = async (
+        neighbors: typeof result.outgoing,
+      ): Promise<typeof result.outgoing> => {
+        const visible = [];
+        for (const neighbor of neighbors) {
+          const meta = await withOwner(this.ownerPool, async (ownerClient) =>
+            getCollectionMeta(ownerClient, workspaceId, neighbor.collection),
+          );
+          if (
+            await canViewPage(this.ownerPool, {
+              workspaceId,
+              collectionId: meta.id,
+              recordId: neighbor.recordId,
+              principalId,
+            })
+          ) {
+            visible.push(neighbor);
+          }
+        }
+        return visible;
+      };
+      return {
+        outgoing: await filterNeighbors(result.outgoing),
+        incoming: await filterNeighbors(result.incoming),
+      };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
