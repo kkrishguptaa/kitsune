@@ -41,6 +41,18 @@ interface RelatedResult {
   incoming: RelatedNeighbor[];
 }
 
+interface BacklinkNeighbor {
+  collection: string;
+  recordId: string;
+  label: string | null;
+  rawTarget: string;
+}
+
+interface BacklinksResult {
+  outgoing: BacklinkNeighbor[];
+  incoming: BacklinkNeighbor[];
+}
+
 interface RevisionSummary {
   revision: number;
   changedFields: string[];
@@ -116,9 +128,11 @@ export function PageView({
     Record<string, RelationOption[]>
   >({});
   const [related, setRelated] = useState<RelatedResult | null>(null);
+  const [backlinks, setBacklinks] = useState<BacklinksResult | null>(null);
   const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [relatedLoading, setRelatedLoading] = useState(false);
+  const [backlinksLoading, setBacklinksLoading] = useState(false);
   const [revisionsLoading, setRevisionsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -193,6 +207,7 @@ export function PageView({
   useEffect(() => {
     let cancelled = false;
     setRelatedLoading(true);
+    setBacklinksLoading(true);
     setRevisionsLoading(true);
     void fetch('/api/related', {
       method: 'POST',
@@ -219,6 +234,31 @@ export function PageView({
       })
       .finally(() => {
         if (!cancelled) setRelatedLoading(false);
+      });
+
+    void fetch(
+      `/api/backlinks?collection=${encodeURIComponent(collection)}&recordId=${encodeURIComponent(pageId)}`,
+    )
+      .then(async (response) => {
+        const body = (await response.json()) as BacklinksResult & {
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!response.ok) {
+          throw new Error(body.error ?? 'Failed to load backlinks');
+        }
+        setBacklinks({
+          outgoing: body.outgoing ?? [],
+          incoming: body.incoming ?? [],
+        });
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+        setBacklinks(null);
+      })
+      .finally(() => {
+        if (!cancelled) setBacklinksLoading(false);
       });
 
     void fetch('/api/history', {
@@ -296,6 +336,23 @@ export function PageView({
       const body = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(body.error ?? 'Update failed');
       await reload();
+      // Refresh wiki-link panel after prose save
+      try {
+        const blRes = await fetch(
+          `/api/backlinks?collection=${encodeURIComponent(collection)}&recordId=${encodeURIComponent(pageId)}`,
+        );
+        const blBody = (await blRes.json()) as BacklinksResult & {
+          error?: string;
+        };
+        if (blRes.ok) {
+          setBacklinks({
+            outgoing: blBody.outgoing ?? [],
+            incoming: blBody.incoming ?? [],
+          });
+        }
+      } catch {
+        // keep prior backlinks
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -521,6 +578,77 @@ export function PageView({
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+
+          <div className="space-y-2 border-t border-border pt-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase">
+              Links
+            </p>
+            {backlinksLoading ? (
+              <Skeleton className="h-12 w-full" />
+            ) : !backlinks ||
+              (backlinks.outgoing.length === 0 &&
+                backlinks.incoming.length === 0) ? (
+              <p className="text-xs text-muted-foreground">
+                No wiki-links yet. Use{' '}
+                <code className="font-mono text-[10px]">[[Title]]</code> in the
+                body.
+              </p>
+            ) : (
+              <div className="space-y-3 text-sm">
+                {backlinks.outgoing.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase text-muted-foreground">
+                      Outgoing
+                    </p>
+                    <ul className="space-y-1.5">
+                      {backlinks.outgoing.map((link, index) => (
+                        <li
+                          key={`wiki-out-${link.rawTarget}-${link.recordId || index}`}
+                        >
+                          {link.collection && link.recordId ? (
+                            <Link
+                              href={pageHref(link.recordId, link.collection)}
+                              className="text-primary underline-offset-4 hover:underline"
+                            >
+                              {link.label ?? link.rawTarget}
+                            </Link>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              [[{link.rawTarget}]] (unresolved)
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {backlinks.incoming.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase text-muted-foreground">
+                      Backlinks
+                    </p>
+                    <ul className="space-y-1.5">
+                      {backlinks.incoming.map((link) => (
+                        <li
+                          key={`wiki-in-${link.collection}-${link.recordId}`}
+                        >
+                          <Link
+                            href={pageHref(link.recordId, link.collection)}
+                            className="text-primary underline-offset-4 hover:underline"
+                          >
+                            {link.label ?? link.recordId.slice(0, 8)}
+                          </Link>
+                          <span className="ml-1 text-[10px] text-muted-foreground">
+                            via [[{link.rawTarget}]]
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
             )}
           </div>
 
