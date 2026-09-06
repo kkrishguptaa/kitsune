@@ -35,7 +35,10 @@ export function mcpOAuthCorsHeaders(request: Request): HeadersInit {
   };
 }
 
-export function withMcpOAuthCors(request: Request, response: Response): Response {
+export function withMcpOAuthCors(
+  request: Request,
+  response: Response,
+): Response {
   const headers = new Headers(response.headers);
   const cors = mcpOAuthCorsHeaders(request);
   for (const [key, value] of Object.entries(cors)) {

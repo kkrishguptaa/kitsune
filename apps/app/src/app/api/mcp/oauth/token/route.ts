@@ -8,10 +8,7 @@ import {
   mintMcpAccessToken,
   pkceChallengeS256,
 } from '@/lib/mcp-oauth';
-import {
-  mcpOAuthOptionsResponse,
-  withMcpOAuthCors,
-} from '@/lib/oauth-cors';
+import { mcpOAuthOptionsResponse, withMcpOAuthCors } from '@/lib/oauth-cors';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

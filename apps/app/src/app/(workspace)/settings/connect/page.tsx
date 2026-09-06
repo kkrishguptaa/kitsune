@@ -176,13 +176,11 @@ export default function SettingsConnectPage() {
         <section className="space-y-3 rounded-lg border border-border p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-sm font-medium">
-                1. API key (optional)
-              </h3>
+              <h3 className="text-sm font-medium">1. API key (optional)</h3>
               <p className="text-xs text-muted-foreground">
-                Only for legacy REST scripts. Cursor remote and Claude connectors
-                sign in with OAuth — no key paste. Treat the key like a password;
-                it is shown once.
+                Only for legacy REST scripts. Cursor remote and Claude
+                connectors sign in with OAuth — no key paste. Treat the key like
+                a password; it is shown once.
               </p>
             </div>
             <Button
