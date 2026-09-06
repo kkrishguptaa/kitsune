@@ -173,20 +173,31 @@ button:focus-visible {
   }
 }
 
+.hero-eyebrow {
+  margin: 0 0 var(--k-space-3);
+  color: var(--k-orange);
+  font-family: var(--k-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .hero-copy h1 {
   margin: 0 0 var(--k-space-4);
-  max-width: 11ch;
+  max-width: 16ch;
   color: var(--k-ink);
   font-family: var(--k-font-display);
-  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-size: clamp(2.25rem, 5.4vw, 3.35rem);
   font-weight: 520;
   letter-spacing: -0.035em;
   line-height: 1.08;
+  text-wrap: balance;
 }
 
 .hero-lede {
   margin: 0 0 var(--k-space-6);
-  max-width: 34rem;
+  max-width: 36rem;
   color: var(--k-muted);
   font-size: 1.125rem;
 }
@@ -443,7 +454,7 @@ button:focus-visible {
   }
 
   .hero-copy h1 {
-    max-width: 14ch;
+    max-width: 18ch;
   }
 }
 
