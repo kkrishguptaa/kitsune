@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { engine } from '@/lib/engine';
-import { requireWorkspace } from '@/lib/require-workspace';
+import { resolveRequestAuth } from '@/lib/request-auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const ctx = await requireWorkspace();
+    const ctx = await resolveRequestAuth(request);
     const schema = await engine.describeSchema(
       ctx.workspaceId,
       ctx.principalId,

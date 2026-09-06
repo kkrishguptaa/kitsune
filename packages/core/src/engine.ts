@@ -68,6 +68,10 @@ import {
   removeTeamMember,
 } from './org/memberships.js';
 import {
+  canViewPage,
+  filterVisibleRecordIds,
+} from './org/page-access.js';
+import {
   type SweepRevisionsResult,
   sweepExpiredRevisions,
 } from './revisions/sweep.js';
@@ -986,6 +990,7 @@ export class KitsuneEngine {
         compiled.sql,
         compiled.params,
       );
+      const meta = await getCollectionMeta(client, workspaceId, request.collection);
       await writeAuditInTxn(client, {
         workspaceId,
         principalId,
@@ -994,7 +999,20 @@ export class KitsuneEngine {
         detail: { collection: request.collection },
       });
       await client.query('COMMIT');
-      return rows;
+      const ids = rows
+        .map((row) => row.id)
+        .filter((id): id is string => typeof id === 'string');
+      const visible = new Set(
+        await filterVisibleRecordIds(this.ownerPool, {
+          workspaceId,
+          collectionId: meta.id,
+          recordIds: ids,
+          principalId,
+        }),
+      );
+      return rows.filter(
+        (row) => typeof row.id === 'string' && visible.has(row.id),
+      );
     } catch (error) {
       await client.query('ROLLBACK');
       if (error instanceof KitsuneError && error.code === 'forbidden') {
@@ -1039,6 +1057,7 @@ export class KitsuneEngine {
         compiled.sql,
         compiled.params,
       );
+      const meta = await getCollectionMeta(client, workspaceId, collection);
       await writeAuditInTxn(client, {
         workspaceId,
         principalId,
@@ -1047,7 +1066,14 @@ export class KitsuneEngine {
         outcome: row ? 'allowed' : 'denied',
       });
       await client.query('COMMIT');
-      return row;
+      if (!row) return null;
+      const allowed = await canViewPage(this.ownerPool, {
+        workspaceId,
+        collectionId: meta.id,
+        recordId,
+        principalId,
+      });
+      return allowed ? row : null;
     } catch (error) {
       await client.query('ROLLBACK');
       if (error instanceof KitsuneError) {
@@ -1098,7 +1124,23 @@ export class KitsuneEngine {
         },
       });
       await client.query('COMMIT');
-      return result;
+      const visibleHits = [];
+      for (const hit of result.hits) {
+        const meta = await withOwner(this.ownerPool, async (ownerClient) =>
+          getCollectionMeta(ownerClient, workspaceId, hit.collection),
+        );
+        if (
+          await canViewPage(this.ownerPool, {
+            workspaceId,
+            collectionId: meta.id,
+            recordId: hit.recordId,
+            principalId,
+          })
+        ) {
+          visibleHits.push(hit);
+        }
+      }
+      return { hits: visibleHits };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
