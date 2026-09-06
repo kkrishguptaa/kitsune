@@ -43,9 +43,10 @@ Observed Cursor failure: POSTing `initialize` to `/api/mcp/tools` returns **405*
 ### Non-goals (this plan)
 
 - MCP Resources / Prompts / Sampling (tools only for v1 of remote).
-- Actually submitting marketplace applications before Phases 2–3 land (prep only until the remote endpoint is live).
+- Submitting marketplace applications before Phases 2–3 land (prep + Phase 5 only after remote MCP + OAuth work).
 - Replacing GraphQL / REST.
 - Metering redesign (reuse existing API-key / usage events).
+- Paying for featured / partner placements (track as ops follow-up after Phase 5 self-serve listings).
 
 ---
 
@@ -213,7 +214,53 @@ Observed Cursor failure: POSTing `initialize` to `/api/mcp/tools` returns **405*
 2. Default connector principals to **propose-only** for mutating tools where product policy requires Inbox review.
 3. Audit + rate-limit OAuth sessions separately from API-key buckets if needed.
 4. Rotate any keys pasted into chats; Connect UI shows plaintext key once then masks.
-5. Optional: MCP registry listing; Client ID Metadata Documents if AS policy requires `2026-07-28` client identity.
+5. Client ID Metadata Documents if AS policy requires `2026-07-28` client identity.
+
+---
+
+### Phase 5 — Marketplace publishing (ChatGPT, Claude, Cursor, Grok)
+
+**Why:** After Phases 2–3, KitsuneOS can connect manually; Phase 5 is distribution — one-click discovery in each host’s catalog. Detail, assets, and gap matrix live in **§12**; this phase is the execution checklist.
+
+**Shared prep (do once before any submission)**
+
+- [ ] Tool annotations complete for every tool (`title` / `readOnlyHint` / `destructiveHint` / `openWorldHint` as required)
+- [ ] Privacy, ToS, support URL, logo, company site ready for listing forms
+- [ ] Seeded reviewer demo workspace (no signup / no inaccessible 2FA)
+- [ ] Publish to **official MCP Registry** (`server.json` with `remotes[]` + npm stdio `packages`) via `mcp-publisher`
+
+**5a — ChatGPT (OpenAI Apps SDK / Plugins)**
+
+- [ ] OpenAI org identity verification (Owner or `api.apps.write`)
+- [ ] Domain challenge: `GET /.well-known/openai-apps-challenge` on MCP host root (plain text)
+- [ ] Attach production MCP + OAuth; run **Scan Tools**; write ~5 positive / ~3 negative test prompts
+- [ ] CSP allowlist if any app UI fetches origins
+- [ ] Submit → review → manually **Publish** (Codex plugin may be created from approved app)
+
+**5b — Claude (Connectors Directory)**
+
+- [ ] Anthropic **Team or Enterprise** org + Directory submit permission
+- [ ] Custom-connector QA on claude.ai first (paste URL + OAuth)
+- [ ] Portal listing copy (tagline ≤55, description ≤2000, categories, prerequisites)
+- [ ] Submit remote MCP in org admin Connectors Directory portal
+- [ ] Optional later: MCPB desktop extension for offline Claude Desktop
+
+**5c — Cursor (Marketplace + cursor.directory)**
+
+- [ ] Public open-source plugin repo with `.cursor-plugin/plugin.json` + `mcp.json` → remote MCP
+- [ ] Local test from `~/.cursor/plugins/local/<name>`
+- [ ] Submit at https://cursor.com/marketplace/publish (manual review; email follow-up)
+- [ ] Mirror listing on cursor.directory (separate queue — does not auto-list officially)
+
+**5d — Grok / xAI (Connectors + Build catalog)**
+
+- [ ] Docs for Grok **Custom** connector (paste MCP URL + OAuth)
+- [ ] Optional featured listing via xAI partnership (not self-serve)
+- [ ] Optional Grok Build plugin repo; PR into `xai-org/plugin-marketplace` with SHA-pinned `.grok-plugin/marketplace.json` entry + `scripts/generate-plugin-index.py` / `validate-catalog.py`
+
+**Suggested submit order:** MCP Registry → Claude Directory → Cursor Marketplace → ChatGPT Apps → Grok Custom docs / Build PR → featured/partner outreach.
+
+**Exit:** At least one remote directory listing live (Claude or ChatGPT) **or** Cursor Marketplace approved; MCP Registry entry published; Connect UI links to install docs for each host.
 
 ---
 
