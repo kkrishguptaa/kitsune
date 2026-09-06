@@ -94,7 +94,7 @@ export default function SettingsConnectPage() {
   );
 
   const generateKey = useCallback(async () => {
-    if (hasApiKey && !apiKey) {
+    if (hasApiKey) {
       const ok = window.confirm(
         'Creating a new key revokes your existing key. AI helpers using the old key will stop working until you update their config. Continue?',
       );
