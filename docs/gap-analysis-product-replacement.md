@@ -59,3 +59,5 @@
 4. Smoke: Notes private → ⌘K → share → graph wiki edge → MCP memory cannot see private → webhook/media if shipped.
 
 **Live (2026-09-06):** Marketing site HTTP 200; app `/health` returns `{"ok":true}` after App Runner roll of image `6de1697`. P0–P1 UI gaps (#2–#8, #12) shipped on this branch; #1 compiler ACL and #9–#11 remain deferred.
+
+**Open free tier (follow-up):** Signup is open via WorkOS AuthKit (no waitlist). Free plan enforces caps (1 workspace, 5 agents, 5 people, 15 databases, 100 MB storage, 250 MCP ops/day). Pro via Dodo Payments lifts caps; Settings → Billing shows usage and upgrade.

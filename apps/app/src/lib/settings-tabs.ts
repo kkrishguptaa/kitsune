@@ -1,6 +1,7 @@
 /** Notion-like Settings chrome — no pages/databases/schema tabs. */
 export const SETTINGS_TABS = [
   { href: '/settings/workspace', label: 'Account' },
+  { href: '/settings/billing', label: 'Billing' },
   { href: '/settings/people', label: 'People' },
   { href: '/settings/teams', label: 'Teams' },
   { href: '/settings/access', label: 'Access' },

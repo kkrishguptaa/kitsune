@@ -20,6 +20,7 @@ import {
   matchesMinApprovalsScope,
 } from './automation/policies.js';
 import { assertWriteEntitlement } from './billing/entitlement.js';
+import { assertPlanLimit } from './billing/plan-limits.js';
 import {
   type BranchFieldMeta,
   copyRelationTable,
@@ -573,6 +574,12 @@ export class KitsuneEngine {
         'validation',
       );
     }
+    if (kind === 'agent') {
+      await assertPlanLimit(this.ownerPool, {
+        workspaceId,
+        dimension: 'agentsPerWorkspace',
+      });
+    }
     await withOwner(this.ownerPool, async (client) => {
       await client.query(
         `INSERT INTO kitsune.principals
@@ -710,6 +717,10 @@ export class KitsuneEngine {
     definition: CollectionDefinition,
   ): Promise<string> {
     await assertWriteEntitlement(this.ownerPool, workspaceId);
+    await assertPlanLimit(this.ownerPool, {
+      workspaceId,
+      dimension: 'collectionsPerWorkspace',
+    });
     validateCollectionDefinition(definition);
     const schemaName = schemaNameForWorkspace(workspaceId);
     const collectionId = uuidv4();
@@ -1572,6 +1583,11 @@ export class KitsuneEngine {
         'validation',
       );
     }
+    await assertPlanLimit(this.ownerPool, {
+      workspaceId,
+      dimension: 'storageBytesPerWorkspace',
+      delta: bytes.length,
+    });
     const contentType = input.contentType?.trim() || 'application/octet-stream';
     const contentHash = sha256Hex(bytes);
 
@@ -4797,6 +4813,10 @@ export class KitsuneEngine {
     actorUserId: string,
     input: { email: string; role: WorkspaceRole; displayName?: string },
   ): Promise<{ membershipId: string; principalId: string }> {
+    await assertPlanLimit(this.ownerPool, {
+      workspaceId,
+      dimension: 'membersPerWorkspace',
+    });
     const principalId = await this.createPrincipal(
       workspaceId,
       'human',

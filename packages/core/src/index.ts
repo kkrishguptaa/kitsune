@@ -32,6 +32,22 @@ export {
   statusGrantsWrite,
 } from './billing/entitlement.js';
 export type {
+  PlanId,
+  PlanLimitDimension,
+  PlanLimits,
+  PlanUsageSnapshot,
+} from './billing/plan-limits.js';
+export {
+  FREE_PLAN_LIMITS,
+  PRO_PLAN_LIMITS,
+  assertPlanLimit,
+  limitsForPlan,
+  loadPlanUsage,
+  loadWorkspacePlan,
+  planIdFromSubscriptionStatus,
+  userHasPaidWorkspace,
+} from './billing/plan-limits.js';
+export type {
   ProcessSubscriptionWebhookInput,
   SubscriptionWebhookResult,
 } from './billing/store.js';

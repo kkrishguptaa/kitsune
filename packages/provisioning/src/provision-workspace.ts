@@ -1,5 +1,6 @@
 import type { KitsuneEngine } from '@kitsuneos/core';
 import {
+  assertPlanLimit,
   claimInvitesForUser,
   createApiKey,
   ensureOwnerMembership,
@@ -213,6 +214,11 @@ export async function createAdditionalWorkspaceForUser(
   engine: KitsuneEngine,
   input: CreateAdditionalWorkspaceInput,
 ): Promise<CreateAdditionalWorkspaceResult> {
+  await assertPlanLimit(engine.ownerPool, {
+    dimension: 'workspacesPerUser',
+    userId: input.userId,
+  });
+
   const created: string[] = [];
   const activate = input.activate !== false;
   const displayName =
