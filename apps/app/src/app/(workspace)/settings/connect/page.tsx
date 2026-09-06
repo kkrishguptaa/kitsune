@@ -10,6 +10,7 @@ type GuideId = 'cursor' | 'claude' | 'custom';
 export default function SettingsConnectPage() {
   const [origin, setOrigin] = useState('');
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [hasApiKey, setHasApiKey] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
@@ -21,6 +22,7 @@ export default function SettingsConnectPage() {
       .then(async (response) => {
         const body = (await response.json()) as {
           apiKeyPlaintext?: string | null;
+          hasApiKey?: boolean;
           error?: string;
         };
         if (!response.ok) {
@@ -30,6 +32,7 @@ export default function SettingsConnectPage() {
         if (body.apiKeyPlaintext) {
           setApiKey(body.apiKeyPlaintext);
         }
+        setHasApiKey(Boolean(body.hasApiKey || body.apiKeyPlaintext));
       })
       .catch(() => setError('Could not load your account'));
   }, []);
@@ -91,6 +94,12 @@ export default function SettingsConnectPage() {
   );
 
   const generateKey = useCallback(async () => {
+    if (hasApiKey && !apiKey) {
+      const ok = window.confirm(
+        'Creating a new key revokes your existing key. AI helpers using the old key will stop working until you update their config. Continue?',
+      );
+      if (!ok) return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -106,12 +115,13 @@ export default function SettingsConnectPage() {
         throw new Error('No key returned');
       }
       setApiKey(body.apiKeyPlaintext);
+      setHasApiKey(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create a key');
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [apiKey, hasApiKey]);
 
   async function copyText(label: string, text: string) {
     try {
@@ -160,7 +170,11 @@ export default function SettingsConnectPage() {
               disabled={busy}
               onClick={() => void generateKey()}
             >
-              {busy ? 'Creating…' : apiKey ? 'Create a new key' : 'Create key'}
+              {busy
+                ? 'Creating…'
+                : apiKey || hasApiKey
+                  ? 'Rotate key'
+                  : 'Create key'}
             </Button>
           </div>
           {apiKey ? (
@@ -176,6 +190,12 @@ export default function SettingsConnectPage() {
                 {copied === 'key' ? 'Copied' : 'Copy key'}
               </Button>
             </div>
+          ) : hasApiKey ? (
+            <p className="text-sm text-muted-foreground">
+              A key is already active for this workspace. It is only shown once
+              when created — use the guides below with the key you saved, or
+              rotate to mint a new one (this revokes the old key).
+            </p>
           ) : (
             <p className="text-sm text-muted-foreground">
               No key on screen yet. Create one to unlock the guides below.
@@ -254,10 +274,16 @@ export default function SettingsConnectPage() {
             />
           ) : null}
 
-          {!apiKey ? (
+          {!apiKey && !hasApiKey ? (
             <p className="text-xs text-amber-700 dark:text-amber-400">
               Create a key first — the samples above still say YOUR_API_KEY
               until you do.
+            </p>
+          ) : null}
+          {!apiKey && hasApiKey ? (
+            <p className="text-xs text-muted-foreground">
+              Paste the key you saved earlier into the config (replace
+              YOUR_API_KEY), or rotate above to reveal a new one.
             </p>
           ) : null}
         </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Settings, Table2 } from 'lucide-react';
+import { Bell, Plus, Settings, Table2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -80,6 +81,14 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Databases</SidebarGroupLabel>
+          <CreateDatabaseDialog
+            trigger={
+              <SidebarGroupAction title="New database">
+                <Plus />
+                <span className="sr-only">New database</span>
+              </SidebarGroupAction>
+            }
+          />
           <SidebarGroupContent>
             <SidebarMenu>
               {collections.length === 0 ? (
