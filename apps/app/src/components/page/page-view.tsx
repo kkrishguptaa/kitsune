@@ -11,6 +11,7 @@ import {
   type FieldMeta,
   type RelationOption,
 } from '@/components/page/field-control';
+import { ShareDialog } from '@/components/page/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -368,6 +369,7 @@ export function PageView({
             </Badge>
           </div>
           <div className="flex gap-2">
+            <ShareDialog collection={collection} recordId={pageId} />
             <Button
               variant="outline"
               size="sm"

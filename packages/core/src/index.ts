@@ -86,6 +86,28 @@ export {
   removeTeamMember,
   switchActiveWorkspace,
 } from './org/memberships.js';
+export type {
+  PageShareCapability,
+  PageAccessState,
+  PageVisibility,
+} from './org/page-access.js';
+export type { OAuthAppSummary, OAuthScope } from './org/oauth-apps.js';
+export {
+  createOAuthApp,
+  issueOAuthClientCredentialsToken,
+  listOAuthApps,
+  resolveOAuthAccessToken,
+  revokeOAuthApp,
+} from './org/oauth-apps.js';
+export {
+  canViewPage,
+  effectivePrincipalIds,
+  filterVisibleRecordIds,
+  getPageAccess,
+  sharePageWithPrincipal,
+  unsharePage,
+  upsertPageVisibility,
+} from './org/page-access.js';
 export {
   type SweepCollectionResult,
   type SweepRevisionsResult,

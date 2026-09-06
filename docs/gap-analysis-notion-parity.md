@@ -26,17 +26,17 @@ Kitsune should **not** abandon change sets / field grants. Extend them with Noti
 
 ## 2. Requirement matrix
 
-| ID | Requirement | Kitsune today | Gap | Build priority |
-|----|-------------|---------------|-----|----------------|
-| N1 | Multi-workspace membership + switcher | `workspace_memberships` + `users.workspace_id` pointer; `listMembershipsForUser`; **no** switch/create UI/API | Switch API, create-another-workspace, sidebar switcher | **P0** |
-| N2 | Private / shared pages + team shares | Collection grants + teams; pages inherit collection visibility | `page_shares` / visibility column; filter list/get/search | **P0** |
-| N3 | Agent profiles + API tokens | Single default agent + rotate key in Connect | CRUD agents, per-agent keys UI/API | **P0** |
-| N4 | General fetch/change API | Substantial REST/MCP | Document + fill holes; **OAuth apps** missing | **P0** |
-| N4b | OAuth apps create databases | None | OAuth app registry, authorize, `databases:create` | **P0** |
-| N5 | WYSIWYG prose | `Textarea` markdown | TipTap/Lexical editor + JSON/md storage | **P0** |
-| N6 | Obsidian-like graph | `listRelated` / `/api/related` | Graph page + `/api/graph` + link extraction | **P1** |
-| N7 | Supermemory-like tools | MCP `search`, VFS | `memory_*` tools + optional memory DB | **P0** |
-| N8 | Kitsune-as-database for apps | MCP `define_collection` | OAuth-bound service principal path | **P0** |
+| ID | Requirement | Kitsune today | Gap | Status |
+|----|-------------|---------------|-----|--------|
+| N1 | Multi-workspace membership + switcher | Memberships + `users.workspace_id`; switcher + create/switch APIs | — | **Shipped** |
+| N2 | Private / shared pages + team shares | `page_access` / `page_shares`; enforced in query/read/search; Share dialog | — | **Shipped** |
+| N3 | Agent profiles + API tokens | `/api/agents` + Connect Agents panel; per-agent keys; `agent_memory` grant | — | **Shipped** |
+| N4 | General fetch/change API | REST (`/api/query`, `/api/records`, …) + MCP; **Bearer API key + OAuth** on data routes | — | **Shipped** |
+| N4b | OAuth apps create databases | `oauth_apps` + `/api/oauth/apps` + `/api/oauth/token` + `databases:create` | — | **Shipped** |
+| N5 | WYSIWYG prose | TipTap `ProseEditor` on prose fields | — | **Shipped** |
+| N6 | Obsidian-like graph | `/graph` UI + `/api/graph` distribution JSON | Link extraction from prose still shallow | **MVP shipped** |
+| N7 | Supermemory-like tools | MCP `memory_search|get|related|remember` over grant-visible pages | — | **Shipped** |
+| N8 | Kitsune-as-database for apps | OAuth service principal + `POST /api/collections` with bearer token | Full OAuth authorize UI (auth code) deferred | **MVP shipped** |
 
 ---
 

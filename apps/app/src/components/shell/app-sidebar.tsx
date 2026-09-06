@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Plus, Settings, Table2 } from 'lucide-react';
+import { Bell, Network, Plus, Settings, Table2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -131,6 +131,18 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith('/graph')}
+              tooltip="Graph"
+            >
+              <Link href="/graph">
+                <Network />
+                <span>Graph</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
