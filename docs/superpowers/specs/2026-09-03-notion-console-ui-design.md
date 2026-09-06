@@ -146,19 +146,18 @@ Subtle only: sidebar active state, sheet open/close, toast. No decorative motion
 
 Settings is workspace chrome only (Account, People, Teams, Access, Connect AI). Database properties and create-database live on the database surface / sidebar — not in Settings.
 
-**Schema**
+**Database properties**
 
-- List collections; select one to edit fields
-- Database properties (add/remove) live on `/c/[collection]` via the Properties sheet; still maps to schema evolution APIs (`addField`, `dropField`)
-- Create collection entry point (defineCollection)
+- Edit properties on `/c/[collection]` through the Properties sheet (maps to schema evolution APIs: `addField`, `dropField`)
+- Create databases from the sidebar or home empty state
 - UX patterned after Notion property config (type picker, name), not a raw JSON form
 
-**Grants**
+**Access**
 
 - Table of grants + create/revoke (existing grants APIs)
-- Access grants for who can use which database; still reachable from Settings
+- Who can use which database; reachable from Settings → Access
 
-**Workspace**
+**Account**
 
 - Show workspace id; API key reveal when provisioned (existing `/api/me` behavior)
 
