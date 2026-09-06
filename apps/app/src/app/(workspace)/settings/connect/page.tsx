@@ -121,7 +121,7 @@ export default function SettingsConnectPage() {
     } finally {
       setBusy(false);
     }
-  }, [apiKey, hasApiKey]);
+  }, [hasApiKey]);
 
   async function copyText(label: string, text: string) {
     try {
