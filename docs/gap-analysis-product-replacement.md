@@ -57,3 +57,5 @@
 2. `SKIP_LOCAL_MIGRATE=1 ./scripts/deploy-all.sh` (or site+app).  
 3. Health check live app URL.  
 4. Smoke: Notes private → ⌘K → share → graph wiki edge → MCP memory cannot see private → webhook/media if shipped.
+
+**Live (2026-09-06):** Marketing site HTTP 200; app `/health` returns `{"ok":true}` after App Runner roll of image `6de1697`. P0–P1 UI gaps (#2–#8, #12) shipped on this branch; #1 compiler ACL and #9–#11 remain deferred.
