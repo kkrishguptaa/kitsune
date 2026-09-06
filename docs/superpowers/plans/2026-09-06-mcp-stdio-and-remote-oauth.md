@@ -350,7 +350,7 @@ Do not claim Claude Web support until Phase 3 manual proof exists.
 4. **PR-D (Phase 3 spike):** AS choice write-up + discovery prototype  
 5. **PR-E (Phase 3):** OAuth + Claude connector QA  
 6. **PR-F (Phase 4):** Deprecate REST + hardening  
-7. **PR-G (Phase 5):** Marketplace packaging + submissions (MCP Registry, Claude Directory, Cursor plugin, OpenAI Apps/Plugins, Grok Build catalog / custom connector docs)
+7. **PR-G (Phase 5):** Marketplace packaging + submissions — MCP Registry, Claude Directory, Cursor plugin, OpenAI Apps/Plugins, Grok Custom docs + Build catalog PR (see Phase 5 + §12)
 
 ---
 
