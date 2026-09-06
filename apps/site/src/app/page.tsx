@@ -40,6 +40,7 @@ export default function LandingPage() {
             aria-label="Product ad: helpers bring work home to one calm place, ready when you need it"
           >
             <source src="/kitsune-agents-ad.mp4" type="video/mp4" />
+            {/* biome-ignore lint/performance/noImgElement: native <video> fallback poster */}
             <img
               src="/kitsune-agents-ad.gif"
               alt="Agents writing into a shared company workspace — gathered, reviewable, ready"
@@ -123,8 +124,7 @@ export default function LandingPage() {
           </a>
         </div>
         <p className="band-note">
-          Questions?{' '}
-          <a href={contactMailto}>support@kitsuneos.com</a>
+          Questions? <a href={contactMailto}>support@kitsuneos.com</a>
         </p>
       </section>
     </main>

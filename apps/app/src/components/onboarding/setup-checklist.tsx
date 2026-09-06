@@ -12,8 +12,8 @@ import {
   ONBOARDING_STEPS,
   type OnboardingProgress,
 } from '@/lib/onboarding';
-import { WORKSPACE_CHANGED_EVENT } from '@/lib/workspace-events';
 import { cn } from '@/lib/utils';
+import { WORKSPACE_CHANGED_EVENT } from '@/lib/workspace-events';
 
 const INITIAL: OnboardingProgress = {
   'create-database': false,
@@ -44,16 +44,20 @@ export function SetupChecklist() {
     refresh();
     window.addEventListener(WORKSPACE_CHANGED_EVENT, refresh);
     return () => window.removeEventListener(WORKSPACE_CHANGED_EVENT, refresh);
-  }, [refresh, pathname]);
+  }, [refresh]);
+
+  useEffect(() => {
+    // Recompute after route changes (e.g. first database or Inbox visit).
+    void pathname;
+    refresh();
+  }, [pathname, refresh]);
 
   const completedCount = useMemo(
     () => ONBOARDING_STEPS.filter((step) => progress[step.id]).length,
     [progress],
   );
 
-  const percent = Math.round(
-    (completedCount / ONBOARDING_STEPS.length) * 100,
-  );
+  const percent = Math.round((completedCount / ONBOARDING_STEPS.length) * 100);
 
   if (hidden) return null;
 

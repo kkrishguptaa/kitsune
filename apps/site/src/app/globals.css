@@ -128,7 +128,7 @@ button:focus-visible {
 .site-signin {
   display: inline-flex;
   padding: 0.55rem 0.9rem;
-  color: var(--k-ink) !important;
+  color: var(--k-ink);
   border: 1px solid var(--k-line);
   border-radius: 999px;
   transition:
@@ -146,7 +146,7 @@ button:focus-visible {
   padding: 0.55rem 1rem;
   border-radius: 999px;
   background: var(--k-orange);
-  color: #140700 !important;
+  color: #140700;
   font-weight: 650;
   text-decoration: none;
 }
