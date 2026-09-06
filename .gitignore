@@ -81,7 +81,7 @@ lerna-debug.log*
 .windsurf/
 .zcode/
 .zencoder/
-agent/skills/
+# agent/skills/ tracked as vendored pack
 data/skills/
 .hermes/
 .inferencesh/
@@ -92,6 +92,6 @@ data/skills/
 .reasonix/
 .terramind/
 .tinycloud/
-skills-lock.json
+# skills-lock.json tracked
 # Root skills/ symlink farm (canonical pack stays under .agents/skills locally)
 /skills/
