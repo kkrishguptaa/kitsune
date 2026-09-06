@@ -4,6 +4,7 @@ export const SETTINGS_TABS = [
   { href: '/settings/people', label: 'People' },
   { href: '/settings/teams', label: 'Teams' },
   { href: '/settings/access', label: 'Access' },
+  { href: '/settings/webhooks', label: 'Webhooks' },
   { href: '/settings/connect', label: 'Connect AI' },
 ] as const;
 

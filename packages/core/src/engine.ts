@@ -148,6 +148,7 @@ import {
   dispatchChangeSetApplied,
   generateWebhookSecret,
   insertWebhookEndpoint,
+  listWebhookDeliveries,
   listWebhookEndpoints,
 } from './webhooks/dispatch.js';
 
@@ -4209,6 +4210,31 @@ export class KitsuneEngine {
       outcome: 'allowed',
       detail: { endpointId },
     });
+  }
+
+  async listWebhookDeliveries(
+    workspaceId: string,
+    principalId: string,
+    endpointId: string,
+    limit = 50,
+  ): Promise<
+    Array<{
+      id: string;
+      endpointId: string;
+      eventType: string;
+      status: 'pending' | 'delivered' | 'failed';
+      attemptCount: number;
+      lastError: string | null;
+      createdAt?: string;
+    }>
+  > {
+    const admin = await this.hasAdminOnAnyCollection(workspaceId, principalId);
+    if (!admin) {
+      throw new KitsuneError('Not found', 'not_found');
+    }
+    return withOwner(this.ownerPool, async (client) =>
+      listWebhookDeliveries(client, workspaceId, endpointId, limit),
+    );
   }
 
   /**

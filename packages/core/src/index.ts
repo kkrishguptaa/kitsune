@@ -168,6 +168,7 @@ export {
 } from './vfs/paths.js';
 export {
   generateWebhookSecret,
+  listWebhookDeliveries,
   signWebhookPayload,
   type WebhookDelivery,
   type WebhookEndpoint,
